@@ -276,7 +276,7 @@ details.append(
 
     items = data || [];
     renderStaff();
-    renderPublic(items.length > 0 ? items : demo);
+    renderPublic(items);
   }
 
   function renderStaff() {
