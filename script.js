@@ -1,13 +1,13 @@
-/* HELMY PRESTIGE — OWNER & ADMIN
-   Add your Supabase project URL and publishable/anon key below.
-   NEVER put your service_role key in browser code.
+
+/* HELMY PRESTIGE LUXURY
+   Supabase inventory, owner/admin login and product management.
+   Never place a service_role key in browser code.
 */
 (() => {
   "use strict";
 
-const SUPABASE_URL = "https://fnftfpthzlgkfexnknaw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
-
+  const SUPABASE_URL = "https://fnftfpthzlgkfexnknaw.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -22,56 +22,88 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
   const saveButton = $("#adminSaveProduct");
   const createAdminForm = $("#ownerCreateAdminForm");
   const ownerPanel = $("#ownerManagementPanel");
+  const categoryFilter = $("#categoryFilter");
+  const imageInput = $("#productImages");
+  const imagePreview = $("#productImagePreview");
 
-  $("#currentYear").textContent = new Date().getFullYear();
+  if ($("#currentYear")) {
+    $("#currentYear").textContent = new Date().getFullYear();
+  }
 
   const demo = [
     {
       name: "RXP-X RS 2022",
+      category: "jet_ski",
       price: 1150000,
       hours: 100,
+      year: 2022,
       description: "Premium personal watercraft.",
-      images: ["IMG_2815.jpeg", "IMG_2814.jpeg", "IMG_2813.jpeg"]
+      images: ["IMG_2815.jpeg", "IMG_2814.jpeg", "IMG_2813.jpeg"],
+      status: "available"
     },
     {
       name: "RXT-X RS 2018",
+      category: "jet_ski",
       price: 750000,
       hours: 85,
+      year: 2018,
       description: "Premium personal watercraft.",
-      images: ["IMG_2812.jpeg", "IMG_2811.jpeg"]
+      images: ["IMG_2812.jpeg", "IMG_2811.jpeg"],
+      status: "available"
     },
     {
       name: "RXP-X RS 2025",
+      category: "jet_ski",
       price: 1250000,
       hours: 128,
+      year: 2025,
       description: "Premium personal watercraft.",
-      images: ["IMG_2809.jpeg", "IMG_2810.jpeg"]
+      images: ["IMG_2809.jpeg", "IMG_2810.jpeg"],
+      status: "available"
     },
     {
       name: "GTX Limited 2024",
+      category: "jet_ski",
       price: 1050000,
       hours: 110,
+      year: 2024,
       description: "Premium personal watercraft.",
-      images: ["IMG_2721.jpeg", "IMG_2720.jpeg"]
+      images: ["IMG_2721.jpeg", "IMG_2720.jpeg"],
+      status: "available"
     }
   ];
+
+  const categories = {
+    car: "CAR",
+    beach_buggy: "BEACH BUGGY",
+    jet_ski: "JET SKI",
+    boat: "BOAT"
+  };
 
   let db = null;
   let user = null;
   let role = null;
   let items = [];
   let editingId = null;
+  let editingImages = [];
   let busy = false;
+  let selectedCategory = "all";
+  let demoMode = false;
 
   const msg = (element, text, type = "") => {
     if (!element) return;
+
     element.textContent = text;
     element.classList.remove("error", "success");
+
     if (type) element.classList.add(type);
   };
 
   const money = value => {
-    return Number.isFinite(Number(value))
+    return value !== null &&
+      value !== undefined &&
+      value !== "" &&
+      Number.isFinite(Number(value))
       ? new Intl.NumberFormat("en-US", {
           maximumFractionDigits: 0
         }).format(Number(value))
@@ -81,10 +113,12 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
   const staff = () => role === "owner" || role === "admin";
   const owner = () => role === "owner";
 
-  function node(tag, className, text) {
+  function node(tag, className = "", text) {
     const element = document.createElement(tag);
+
     if (className) element.className = className;
     if (text !== undefined) element.textContent = String(text);
+
     return element;
   }
 
@@ -92,17 +126,22 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
     if (!button) return;
 
     if (isBusy) {
-      button.dataset.oldText ||= button.textContent;
+      if (!button.dataset.oldText) {
+        button.dataset.oldText = button.textContent;
+      }
+
       button.textContent = label;
       button.disabled = true;
     } else {
       button.textContent = button.dataset.oldText || button.textContent;
       button.disabled = false;
+      delete button.dataset.oldText;
     }
   }
 
   function openLogin() {
     if (!modal) return;
+
     modal.hidden = false;
     document.body.classList.add("staff-login-open");
     $("#staffEmail")?.focus();
@@ -110,6 +149,7 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
 
   function closeLogin() {
     if (modal) modal.hidden = true;
+
     document.body.classList.remove("staff-login-open");
   }
 
@@ -130,12 +170,30 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
   });
 
   function validImage(source) {
+    if (typeof source !== "string" || !source.trim()) return "";
+
     try {
       const url = new URL(source, location.href);
-      return ["https:", "http:"].includes(url.protocol) ? url.href : "";
+
+      if (!["https:", "http:"].includes(url.protocol)) return "";
+
+      return url.href;
     } catch {
       return "";
     }
+  }
+
+  function formatCategory(category) {
+    return categories[category] || "LUXURY COLLECTION";
+  }
+
+  function getVisibleProducts(list) {
+    if (selectedCategory === "all") return list;
+
+    return list.filter(product => {
+      const category = product.category || "jet_ski";
+      return category === selectedCategory;
+    });
   }
 
   function renderPublic(list) {
@@ -143,119 +201,213 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
 
     publicList.replaceChildren();
 
-    if (!list.length) {
+    const visibleProducts = getVisibleProducts(list);
+
+    if (!visibleProducts.length) {
       publicList.append(
         node(
           "p",
           "loading-copy",
-          "No inventory currently listed. Contact our team for availability."
+          "No products in this category yet. Contact our team for availability."
         )
       );
+
       return;
     }
 
-    list.forEach(product => {
+    visibleProducts.forEach(product => {
       const card = node("article", "public-product-card");
       const images = Array.isArray(product.images) ? product.images : [];
       const imageSource = validImage(images[0]);
 
+      const category = product.category || "jet_ski";
+
       if (imageSource) {
         const image = node("img", "public-product-image");
+
         image.src = imageSource;
-        image.alt = product.name || "Watercraft";
+        image.alt = product.name || "Helmy Prestige Luxury product";
         image.loading = "lazy";
 
         image.onerror = () => {
           image.replaceWith(
-            node("div", "public-product-image-placeholder", "IMAGE NOT AVAILABLE")
+            node(
+              "div",
+              "public-product-image-placeholder",
+              "IMAGE NOT AVAILABLE"
+            )
           );
         };
 
         card.append(image);
       } else {
         card.append(
-          node("div", "public-product-image-placeholder", "HELMY PRESTIGE")
+          node(
+            "div",
+            "public-product-image-placeholder",
+            "HELMY PRESTIGE"
+          )
         );
       }
 
       const details = node("div", "public-product-details");
 
-      details.append(node("h3", "", product.name || "Watercraft"));
-      const productStatus = product.status || "available";
+      details.append(
+        node("p", "product-category-label", formatCategory(category))
+      );
 
-details.append(
-  node(
-    "p",
-    `product-status ${productStatus}`,
-    productStatus === "sold_out" ? "SOLD OUT" : "AVAILABLE"
-  )
-);
+      details.append(
+        node("h3", "", product.name || "Luxury Product")
+      );
+
+      const status = product.status || "available";
+
       details.append(
         node(
           "p",
-          "product-meta",
-          product.hours == null
-            ? "Hours not listed"
-            : `${product.hours} engine hours`
+          `product-status ${status}`,
+          status === "sold_out" ? "SOLD OUT" : "AVAILABLE"
         )
       );
+
+      // Vehicle and product specifications
+      const specs = node("div", "product-specifications");
+
+      if (product.year != null && product.year !== "") {
+        specs.append(
+          node("span", "product-spec", `YEAR: ${product.year}`)
+        );
+      }
+
+      if (category === "car" || category === "beach_buggy") {
+        if (product.mileage != null && product.mileage !== "") {
+          specs.append(
+            node(
+              "span",
+              "product-spec",
+              `MILEAGE: ${money(product.mileage)} KM`
+            )
+          );
+        }
+
+        if (product.horsepower != null && product.horsepower !== "") {
+          specs.append(
+            node(
+              "span",
+              "product-spec",
+              `POWER: ${product.horsepower} HP`
+            )
+          );
+        }
+      }
+
+      if (
+        (category === "jet_ski" || category === "boat") &&
+        product.hours != null &&
+        product.hours !== ""
+      ) {
+        specs.append(
+          node(
+            "span",
+            "product-spec",
+            `ENGINE HOURS: ${product.hours}`
+          )
+        );
+      }
+
+      if (specs.childElementCount) {
+        details.append(specs);
+      }
 
       details.append(
         node("p", "product-price", `${money(product.price)} EGP`)
       );
 
-      
-details.append(
-  node(
-    "p",
-    "public-product-description",
-    product.description || "Contact us for details and availability."
-  )
-);
+      details.append(
+        node(
+          "p",
+          "public-product-description",
+          product.description || "Contact us for details and availability."
+        )
+      );
 
-// BUY NOW - WhatsApp contact
-const buyNow = node("a", "buy-now-button", "BUY NOW");
+      const buyNow = node("a", "buy-now-button", "BUY NOW");
 
-const message =
-  `Hello Helmy Prestige Luxury! I'm interested in ${product.name || "this product"}. ` +
-  `Price: ${money(product.price)} EGP.`;
+      const message =
+        `Hello Helmy Prestige Luxury! I'm interested in ${product.name || "this product"}. ` +
+        `Category: ${formatCategory(category)}. ` +
+        `Price: ${money(product.price)} EGP.`;
 
-buyNow.href =
-  "https://wa.me/201117000625?text=" + encodeURIComponent(message);
+      buyNow.href =
+        "https://wa.me/201117000625?text=" +
+        encodeURIComponent(message);
 
-buyNow.target = "_blank";
-buyNow.rel = "noopener noreferrer";
+      buyNow.target = "_blank";
+      buyNow.rel = "noopener noreferrer";
 
-details.append(buyNow);
-
-
-            card.append(details);
+      details.append(buyNow);
+      card.append(details);
       publicList.append(card);
     });
   }
 
+  function setCategory(category) {
+    selectedCategory = category;
+
+    $$(".category-button", categoryFilter || document).forEach(button => {
+      const active = button.dataset.category === category;
+
+      button.classList.toggle("active", active);
+
+      if (active) {
+        button.setAttribute("aria-pressed", "true");
+      } else {
+        button.setAttribute("aria-pressed", "false");
+      }
+    });
+
+    renderPublic(demoMode ? demo : items);
+  }
+
+  $$(".category-button", categoryFilter || document).forEach(button => {
+    button.addEventListener("click", () => {
+      setCategory(button.dataset.category || "all");
+    });
+  });
+
   async function publicInventory() {
-  if (!db) {
-    renderPublic([]);
-    msg(publicMsg, "Could not connect to the product database.");
-    return;
+    if (!db) {
+      renderPublic(demo);
+      msg(publicMsg, "Showing demonstration products.");
+      return;
+    }
+
+    const { data, error } = await db
+      .from("products")
+      .select(
+        "id,name,category,price,hours,year,mileage,horsepower,description,images,status,created_at"
+      )
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Public inventory error:", error);
+
+      renderPublic([]);
+      msg(
+        publicMsg,
+        "Could not load products. Please check the database connection.",
+        "error"
+      );
+
+      return;
+    }
+
+    items = data || [];
+    demoMode = false;
+
+    renderPublic(items);
+    msg(publicMsg, "");
   }
-
-  const { data, error } = await db
-    .from("products")
-    .select("id,name,price,hours,description,images,status")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    renderPublic([]);
-    msg(publicMsg, "Could not load products. Please try again.");
-    return;
-  }
-
-  renderPublic(data || []);
-  msg(publicMsg, "");
-}
 
   async function getProfile(userId) {
     const { data, error } = await db
@@ -276,7 +428,9 @@ details.append(buyNow);
   async function loadProducts() {
     if (!staff() || !productList) return;
 
-    productList.replaceChildren(node("p", "", "Loading inventory..."));
+    productList.replaceChildren(
+      node("p", "", "Loading inventory...")
+    );
 
     const { data, error } = await db
       .from("products")
@@ -284,14 +438,21 @@ details.append(buyNow);
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error(error);
+      console.error("Staff inventory error:", error);
+
       productList.replaceChildren(
-        node("p", "", "Unable to load products. Check database permissions.")
+        node(
+          "p",
+          "",
+          "Unable to load products. Check database permissions and columns."
+        )
       );
+
       return;
     }
 
     items = data || [];
+
     renderStaff();
     renderPublic(items);
   }
@@ -302,42 +463,63 @@ details.append(buyNow);
     productList.replaceChildren();
 
     if (!items.length) {
-      productList.append(node("p", "", "No products in database yet."));
+      productList.append(
+        node("p", "", "No products in database yet.")
+      );
+
       return;
     }
 
     items.forEach(product => {
       const card = node("article", "admin-product-item");
+      const category = product.category || "jet_ski";
 
-      card.append(node("h4", "", product.name));
+      card.append(node("h4", "", product.name || "Unnamed product"));
+
+      card.append(
+        node("p", "", `Category: ${formatCategory(category)}`)
+      );
+
       card.append(
         node("p", "", `Price: ${money(product.price)} EGP`)
       );
-      card.append(
-        node(
-          "p",
-          "",
-          `Hours: ${product.hours ?? "Not specified"}`
-        )
-      );
+
+      if (product.year != null) {
+        card.append(node("p", "", `Year: ${product.year}`));
+      }
+
+      if (product.mileage != null) {
+        card.append(
+          node("p", "", `Mileage: ${money(product.mileage)} KM`)
+        );
+      }
+
+      if (product.horsepower != null) {
+        card.append(
+          node("p", "", `Horsepower: ${product.horsepower} HP`)
+        );
+      }
+
+      if (product.hours != null) {
+        card.append(
+          node("p", "", `Engine hours: ${product.hours}`)
+        );
+      }
+
       card.append(
         node("p", "", product.description || "No description")
       );
-       
-card.append(
-  node("p", "", product.description || "No description")
-);
 
-card.append(
-  node(
-    "p",
-    `product-status ${product.status || "available"}`,
-    product.status === "sold_out" ? "SOLD OUT" : "AVAILABLE"
-  )
-);
-
+      card.append(
+        node(
+          "p",
+          `product-status ${product.status || "available"}`,
+          product.status === "sold_out" ? "SOLD OUT" : "AVAILABLE"
+        )
+      );
 
       const actions = node("div", "admin-product-item-actions");
+
       const editButton = node("button", "", "Edit");
       const deleteButton = node("button", "", "Delete");
 
@@ -352,19 +534,34 @@ card.append(
 
       actions.append(editButton, deleteButton);
       card.append(actions);
+
       productList.append(card);
     });
   }
 
   async function showDashboard(profile) {
-    user = (await db.auth.getUser()).data.user;
+    const { data, error } = await db.auth.getUser();
+
+    if (error) throw error;
+
+    user = data.user;
     role = profile.role;
+
+    if (!dashboard) return;
 
     dashboard.hidden = false;
     closeLogin();
 
-    $("[data-staff-email]").textContent = profile.email || user?.email || "";
-    $("[data-staff-role]").textContent = role.toUpperCase();
+    const emailElement = $("[data-staff-email]");
+    const roleElement = $("[data-staff-role]");
+
+    if (emailElement) {
+      emailElement.textContent = profile.email || user?.email || "";
+    }
+
+    if (roleElement) {
+      roleElement.textContent = role.toUpperCase();
+    }
 
     $$(".owner-only").forEach(element => {
       element.hidden = !owner();
@@ -375,26 +572,70 @@ card.append(
     await loadProducts();
   }
 
+  function showExistingImages(images) {
+    if (!imagePreview) return;
+
+    imagePreview.replaceChildren();
+
+    (Array.isArray(images) ? images : []).forEach(source => {
+      const url = validImage(source);
+
+      if (!url) return;
+
+      const image = node("img");
+      image.src = url;
+      image.alt = "Existing product image";
+      image.style.width = "100px";
+      image.style.height = "90px";
+      image.style.objectFit = "cover";
+      image.style.margin = "5px";
+
+      imagePreview.append(image);
+    });
+  }
+
   function editProduct(product) {
+    if (!productForm) return;
+
     editingId = product.id;
 
+    editingImages = Array.isArray(product.images)
+      ? [...product.images]
+      : [];
+
     const values = {
-      name: product.name,
-      price: product.price,
-      hours: product.hours,
-      description: product.description,
-      images: Array.isArray(product.images)
-        ? product.images.join("\n")
-        : ""
+      name: product.name ?? "",
+      price: product.price ?? "",
+      category: product.category || "jet_ski",
+      year: product.year ?? "",
+      mileage: product.mileage ?? "",
+      horsepower: product.horsepower ?? "",
+      hours: product.hours ?? "",
+      description: product.description ?? "",
+      status: product.status || "available"
     };
 
     for (const [name, value] of Object.entries(values)) {
-      productForm.elements.namedItem(name).value = value ?? "";
+      const field = productForm.elements.namedItem(name);
+
+      if (field && field.type !== "file") {
+        field.value = value;
+      }
     }
 
-    saveButton.textContent = "UPDATE PRODUCT";
+    // Never assign a value to a file input.
+    if (imageInput) imageInput.value = "";
 
-    msg($(".admin-message", productForm), "Editing product.");
+    showExistingImages(editingImages);
+
+    if (saveButton) {
+      saveButton.textContent = "UPDATE PRODUCT";
+    }
+
+    msg(
+      $(".admin-message", productForm),
+      "Editing product. Existing images will be kept unless you remove or replace them."
+    );
 
     productForm.scrollIntoView({
       behavior: "smooth",
@@ -402,36 +643,34 @@ card.append(
     });
   }
 
- 
-  // Product images preview
-  const imageInput = document.getElementById("productImages");
-  const imagePreview = document.getElementById("productImagePreview");
-
   imageInput?.addEventListener("change", () => {
     if (!imagePreview) return;
 
-    imagePreview.replaceChildren();
+    showExistingImages(editingImages);
 
     Array.from(imageInput.files || []).forEach(file => {
       if (!file.type.startsWith("image/")) return;
 
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.alt = file.name;
-      img.style.width = "100px";
-      img.style.height = "90px";
-      img.style.objectFit = "cover";
-      img.style.margin = "5px";
+      const image = node("img");
 
-      imagePreview.appendChild(img);
+      image.src = URL.createObjectURL(file);
+      image.alt = file.name;
+      image.style.width = "100px";
+      image.style.height = "90px";
+      image.style.objectFit = "cover";
+      image.style.margin = "5px";
+
+      imagePreview.append(image);
     });
   });
- 
-  
+
   async function uploadProductImages(existingImages = []) {
-    const input = document.getElementById("productImages");
-    const files = Array.from(input?.files || []);
+    const files = Array.from(imageInput?.files || []);
     const imageUrls = [...existingImages];
+
+    if (files.length && !db) {
+      throw new Error("The image database is not connected.");
+    }
 
     for (const file of files) {
       if (!file.type.startsWith("image/")) {
@@ -443,7 +682,11 @@ card.append(
       }
 
       const extension =
-        file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        file.name
+          .split(".")
+          .pop()
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "") || "jpg";
 
       const path = `${crypto.randomUUID()}.${extension}`;
 
@@ -460,39 +703,60 @@ card.append(
         .from("product-images")
         .getPublicUrl(path);
 
-      imageUrls.push(data.publicUrl);
+      if (data?.publicUrl) {
+        imageUrls.push(data.publicUrl);
+      }
     }
 
     return imageUrls;
   }
 
-   
-function readProduct() {
-  const name = productForm.elements.name.value.trim();
-  const price = productForm.elements.price.value;
-  const hours = productForm.elements.hours.value;
-  const description = productForm.elements.description.value.trim();
+  function readProduct() {
+    const name = productForm.elements.name.value.trim();
+    const price = productForm.elements.price.value;
+    const category = productForm.elements.category.value;
+    const year = productForm.elements.year.value;
+    const mileage = productForm.elements.mileage.value;
+    const horsepower = productForm.elements.horsepower.value;
+    const hours = productForm.elements.hours.value;
+    const description = productForm.elements.description.value.trim();
 
-  if (!name) {
-    throw new Error("Enter a product name.");
+    if (!name) {
+      throw new Error("Enter a product name.");
+    }
+
+    if (price === "" || !Number.isFinite(+price) || +price < 0) {
+      throw new Error("Enter a valid price.");
+    }
+
+    if (!Object.hasOwn(categories, category)) {
+      throw new Error("Choose a valid product category.");
+    }
+
+    const optionalNumber = (value, label) => {
+      if (value === "") return null;
+
+      const number = Number(value);
+
+      if (!Number.isFinite(number) || number < 0) {
+        throw new Error(`Enter a valid ${label}.`);
+      }
+
+      return number;
+    };
+
+    return {
+      name,
+      price: Number(price),
+      category,
+      year: optionalNumber(year, "year"),
+      mileage: optionalNumber(mileage, "mileage"),
+      horsepower: optionalNumber(horsepower, "horsepower"),
+      hours: optionalNumber(hours, "engine hours"),
+      description,
+      images: [...editingImages]
+    };
   }
-
-  if (price === "" || !Number.isFinite(+price) || +price < 0) {
-    throw new Error("Enter a valid price.");
-  }
-
-  if (hours !== "" && (!Number.isFinite(+hours) || +hours < 0)) {
-    throw new Error("Enter valid engine hours.");
-  }
-
-  return {
-    name,
-    price: +price,
-    hours: hours === "" ? null : +hours,
-    description,
-    images: []
-  };
-}
 
   productForm?.addEventListener("submit", async event => {
     event.preventDefault();
@@ -502,14 +766,17 @@ function readProduct() {
     busy = true;
     toggleBusy(saveButton, true, "SAVING...");
 
-    const status = $(".admin-message", productForm);
-    msg(status, "");
+    const statusMessage = $(".admin-message", productForm);
+
+    msg(statusMessage, "");
 
     try {
-      
-const product = readProduct();
-product.status = document.getElementById("productStatus")?.value || "available";
-product.images = await uploadProductImages(product.images);
+      const product = readProduct();
+
+      product.status =
+        $("#productStatus")?.value || "available";
+
+      product.images = await uploadProductImages(product.images);
 
       const result = editingId
         ? await db
@@ -527,16 +794,24 @@ product.images = await uploadProductImages(product.images);
       if (result.error) throw result.error;
 
       editingId = null;
-      productForm.reset();
-      saveButton.textContent = "SAVE PRODUCT";
+      editingImages = [];
 
-      msg(status, "Product saved successfully.", "success");
+      productForm.reset();
+
+      if (imagePreview) imagePreview.replaceChildren();
+
+      if (saveButton) {
+        saveButton.textContent = "SAVE PRODUCT";
+      }
+
+      msg(statusMessage, "Product saved successfully.", "success");
 
       await loadProducts();
     } catch (error) {
-      console.error(error);
+      console.error("Save product error:", error);
+
       msg(
-        status,
+        statusMessage,
         error.message || "Could not save product.",
         "error"
       );
@@ -567,7 +842,8 @@ product.images = await uploadProductImages(product.images);
 
       await loadProducts();
     } catch (error) {
-      console.error(error);
+      console.error("Delete product error:", error);
+
       alert(error.message || "Could not delete product.");
     } finally {
       busy = false;
@@ -577,28 +853,40 @@ product.images = await uploadProductImages(product.images);
   $$("[data-cancel-product]").forEach(button => {
     button.addEventListener("click", () => {
       editingId = null;
-      productForm.reset();
-      saveButton.textContent = "SAVE PRODUCT";
+      editingImages = [];
+
+      productForm?.reset();
+
+      if (imagePreview) imagePreview.replaceChildren();
+
+      if (saveButton) {
+        saveButton.textContent = "SAVE PRODUCT";
+      }
+
       msg($(".admin-message", productForm), "");
     });
   });
 
-  loginForm.addEventListener("submit", async event => {
+  loginForm?.addEventListener("submit", async event => {
     event.preventDefault();
 
     if (!db) {
       msg(
         $(".admin-message", loginForm),
-        "Configure Supabase URL and key in script.js first.",
+        "Supabase is not connected. Check your configuration.",
         "error"
       );
+
       return;
     }
 
     if (busy) return;
 
     busy = true;
-    toggleBusy($("#staffLoginSubmit"), true, "SIGNING IN...");
+
+    const loginButton = $("#staffLoginSubmit");
+
+    toggleBusy(loginButton, true, "SIGNING IN...");
 
     try {
       const { data, error } = await db.auth.signInWithPassword({
@@ -609,9 +897,13 @@ product.images = await uploadProductImages(product.images);
       if (error) throw error;
 
       const profile = await getProfile(data.user.id);
+
       await showDashboard(profile);
+
+      msg($(".admin-message", loginForm), "");
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
+
       await db.auth.signOut();
 
       msg(
@@ -621,11 +913,13 @@ product.images = await uploadProductImages(product.images);
       );
     } finally {
       busy = false;
-      toggleBusy($("#staffLoginSubmit"), false);
+      toggleBusy(loginButton, false);
     }
   });
 
   async function logout() {
+    if (!db) return;
+
     const { error } = await db.auth.signOut();
 
     if (error) {
@@ -636,8 +930,15 @@ product.images = await uploadProductImages(product.images);
     user = null;
     role = null;
     items = [];
-    dashboard.hidden = true;
-    productForm.reset();
+    editingId = null;
+    editingImages = [];
+
+    if (dashboard) dashboard.hidden = true;
+
+    productForm?.reset();
+
+    if (imagePreview) imagePreview.replaceChildren();
+
     openLogin();
   }
 
@@ -661,13 +962,19 @@ product.images = await uploadProductImages(product.images);
     const password = createAdminForm.elements.password.value;
 
     if (password.length < 12) {
-      msg(status, "Use a password with at least 12 characters.", "error");
+      msg(
+        status,
+        "Use a password with at least 12 characters.",
+        "error"
+      );
+
       return;
     }
 
     busy = true;
 
     const button = $('button[type="submit"]', createAdminForm);
+
     toggleBusy(button, true, "CREATING...");
 
     try {
@@ -679,9 +986,11 @@ product.images = await uploadProductImages(product.images);
       if (data?.error) throw new Error(data.error);
 
       createAdminForm.reset();
+
       msg(status, "Admin account created successfully.", "success");
     } catch (error) {
-      console.error(error);
+      console.error("Create admin error:", error);
+
       msg(
         status,
         error.message || "Could not create Admin. Check Edge Function setup.",
@@ -694,8 +1003,7 @@ product.images = await uploadProductImages(product.images);
   });
 
   async function init() {
-    dashboard.hidden = true;
-
+    if (dashboard) dashboard.hidden = true;
     if (ownerPanel) ownerPanel.hidden = true;
 
     if (
@@ -703,11 +1011,14 @@ product.images = await uploadProductImages(product.images);
       SUPABASE_KEY.startsWith("YOUR_") ||
       !window.supabase
     ) {
+      demoMode = true;
       renderPublic(demo);
+
       msg(
         publicMsg,
-        "Demo inventory. Add your Supabase settings to enable live inventory and login."
+        "Demo inventory. Supabase is not connected."
       );
+
       return;
     }
 
@@ -726,14 +1037,20 @@ product.images = await uploadProductImages(product.images);
     await publicInventory();
 
     const {
-      data: { session }
+      data: { session },
+      error: sessionError
     } = await db.auth.getSession();
+
+    if (sessionError) {
+      console.error("Session error:", sessionError);
+    }
 
     if (session?.user) {
       try {
-        await showDashboard(await getProfile(session.user.id));
+        const profile = await getProfile(session.user.id);
+        await showDashboard(profile);
       } catch (error) {
-        console.error(error);
+        console.error("Restore session error:", error);
         await db.auth.signOut();
       }
     }
@@ -742,13 +1059,15 @@ product.images = await uploadProductImages(product.images);
       if (event === "SIGNED_OUT") {
         user = null;
         role = null;
-        dashboard.hidden = true;
+
+        if (dashboard) dashboard.hidden = true;
       } else if (event === "SIGNED_IN" && session?.user) {
         setTimeout(async () => {
           try {
-            await showDashboard(await getProfile(session.user.id));
+            const profile = await getProfile(session.user.id);
+            await showDashboard(profile);
           } catch (error) {
-            console.error(error);
+            console.error("Auth state error:", error);
             await db.auth.signOut();
           }
         }, 0);
@@ -757,8 +1076,17 @@ product.images = await uploadProductImages(product.images);
   }
 
   init().catch(error => {
-    console.error(error);
-    renderPublic(demo);
-    msg(publicMsg, "Site is in demo mode. Check Supabase setup.");
+    console.error("Initialization error:", error);
+
+    if (!items.length) {
+      demoMode = true;
+      renderPublic(demo);
+    }
+
+    msg(
+      publicMsg,
+      "Could not initialize the live inventory. Check Supabase and database columns.",
+      "error"
+    );
   });
 })();
