@@ -29,21 +29,21 @@ const SUPABASE_KEY="sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
 
   const demo = [
     {
-      name: "RXP-X RX 2022",
+      name: "RXP-X RS 2022",
       price: 1150000,
       hours: 100,
       description: "Premium personal watercraft.",
       images: ["IMG_2815.jpeg", "IMG_2814.jpeg", "IMG_2813.jpeg"]
     },
     {
-      name: "RXT-X RX 2018",
+      name: "RXT-X RS 2018",
       price: 750000,
       hours: 85,
       description: "Premium personal watercraft.",
       images: ["IMG_2812.jpeg", "IMG_2811.jpeg"]
     },
     {
-      name: "RXP-X RX 2025",
+      name: "RXP-X RS 2025",
       price: 1250000,
       hours: 128,
       description: "Premium personal watercraft.",
