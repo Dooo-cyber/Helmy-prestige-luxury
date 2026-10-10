@@ -234,7 +234,7 @@ const SUPABASE_KEY="";
         "Showing demo inventory because live inventory could not be loaded."
       );
     } else {
-      renderPublic(data || []);
+      renderPublic(data && data.length > 0 ? data : demo);
       msg(publicMsg, "");
     }
   }
