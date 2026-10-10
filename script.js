@@ -181,7 +181,15 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
       const details = node("div", "public-product-details");
 
       details.append(node("h3", "", product.name || "Watercraft"));
+      const productStatus = product.status || "available";
 
+details.append(
+  node(
+    "p",
+    `product-status ${productStatus}`,
+    productStatus === "sold_out" ? "SOLD OUT" : "AVAILABLE"
+  )
+);
       details.append(
         node(
           "p",
@@ -303,6 +311,19 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
       card.append(
         node("p", "", product.description || "No description")
       );
+       
+card.append(
+  node("p", "", product.description || "No description")
+);
+
+card.append(
+  node(
+    "p",
+    `product-status ${product.status || "available"}`,
+    product.status === "sold_out" ? "SOLD OUT" : "AVAILABLE"
+  )
+);
+
 
       const actions = node("div", "admin-product-item-actions");
       const editButton = node("button", "", "Edit");
@@ -369,12 +390,78 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
     });
   }
 
-  function readProduct() {
+ 
+  // Product images preview
+  const imageInput = document.getElementById("productImages");
+  const imagePreview = document.getElementById("productImagePreview");
+
+  imageInput?.addEventListener("change", () => {
+    if (!imagePreview) return;
+
+    imagePreview.replaceChildren();
+
+    Array.from(imageInput.files || []).forEach(file => {
+      if (!file.type.startsWith("image/")) return;
+
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.alt = file.name;
+      img.style.width = "100px";
+      img.style.height = "90px";
+      img.style.objectFit = "cover";
+      img.style.margin = "5px";
+
+      imagePreview.appendChild(img);
+    });
+  });
+ 
+  
+  async function uploadProductImages(existingImages = []) {
+    const input = document.getElementById("productImages");
+    const files = Array.from(input?.files || []);
+    const imageUrls = [...existingImages];
+
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Please select image files only.");
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        throw new Error("Each image must be 10 MB or smaller.");
+      }
+
+      const extension =
+        file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+
+      const path = `${crypto.randomUUID()}.${extension}`;
+
+      const { error } = await db.storage
+        .from("product-images")
+        .upload(path, file, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      const { data } = db.storage
+        .from("product-images")
+        .getPublicUrl(path);
+
+      imageUrls.push(data.publicUrl);
+    }
+
+    return imageUrls;
+  }
+
+   function readProduct() {
     const name = productForm.elements.name.value.trim();
     const price = productForm.elements.price.value;
     const hours = productForm.elements.hours.value;
-    const description = productForm.elements.description.value.trim();
-    const imageText = productForm.elements.images.value.trim();
+    const description = productForm.elements.description.value.trim(); 
+    const imageField = productForm.elements.namedItem("images");
+    const imageText = imageField ? imageField.value.trim() : "";
+
 
     if (!name) {
       throw new Error("Enter a product name.");
@@ -430,7 +517,10 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
     msg(status, "");
 
     try {
-      const product = readProduct();
+      
+const product = readProduct();
+product.status = document.getElementById("productStatus")?.value || "available";
+product.images = await uploadProductImages(product.images);
 
       const result = editingId
         ? await db
