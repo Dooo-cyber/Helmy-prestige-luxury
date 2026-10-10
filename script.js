@@ -273,7 +273,7 @@ const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
 
     items = data || [];
     renderStaff();
-    renderPublic(items);
+    renderPublic(items.length > 0 ? items : demo);
   }
 
   function renderStaff() {
