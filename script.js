@@ -454,57 +454,33 @@ card.append(
     return imageUrls;
   }
 
-   function readProduct() {
-    const name = productForm.elements.name.value.trim();
-    const price = productForm.elements.price.value;
-    const hours = productForm.elements.hours.value;
-    const description = productForm.elements.description.value.trim(); 
-    const imageField = productForm.querySelector('[name="images"]:not([type="file"])');
-    const imageText = imageField ? imageField.value.trim() : "";
-    
+   
+function readProduct() {
+  const name = productForm.elements.name.value.trim();
+  const price = productForm.elements.price.value;
+  const hours = productForm.elements.hours.value;
+  const description = productForm.elements.description.value.trim();
 
-
-    if (!name) {
-      throw new Error("Enter a product name.");
-    }
-
-    if (price === "" || !Number.isFinite(+price) || +price < 0) {
-      throw new Error("Enter a valid price.");
-    }
-
-    if (
-      hours !== "" &&
-      (!Number.isFinite(+hours) || +hours < 0)
-    ) {
-      throw new Error("Enter valid engine hours.");
-    }
-
-    const images = imageText
-      ? imageText.split(/\n+/).map(source => source.trim()).filter(Boolean)
-      : [];
-
-    images.forEach(source => {
-      let url;
-
-      try {
-        url = new URL(source);
-      } catch {
-        throw new Error("Every image must be a valid URL.");
-      }
-
-      if (!["http:", "https:"].includes(url.protocol)) {
-        throw new Error("Image URLs must use HTTP or HTTPS.");
-      }
-    });
-
-    return {
-      name,
-      price: +price,
-      hours: hours === "" ? null : +hours,
-      description,
-      images
-    };
+  if (!name) {
+    throw new Error("Enter a product name.");
   }
+
+  if (price === "" || !Number.isFinite(+price) || +price < 0) {
+    throw new Error("Enter a valid price.");
+  }
+
+  if (hours !== "" && (!Number.isFinite(+hours) || +hours < 0)) {
+    throw new Error("Enter valid engine hours.");
+  }
+
+  return {
+    name,
+    price: +price,
+    hours: hours === "" ? null : +hours,
+    description,
+    images: []
+  };
+}
 
   productForm?.addEventListener("submit", async event => {
     event.preventDefault();
