@@ -218,32 +218,27 @@ details.append(
   }
 
   async function publicInventory() {
-    if (!db) {
-      renderPublic(demo);
-      msg(
-        publicMsg,
-        "Demo inventory is shown. Configure Supabase to enable live inventory."
-      );
-      return;
-    }
-
-    const { data, error } = await db
-      .from("products")
-      .select("id,name,price,hours,description,images,status")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error(error);
-      renderPublic(demo);
-      msg(
-        publicMsg,
-        "Showing demo inventory because live inventory could not be loaded."
-      );
-    } else {
-      renderPublic(data && data.length > 0 ? data : demo);
-      msg(publicMsg, "");
-    }
+  if (!db) {
+    renderPublic([]);
+    msg(publicMsg, "Could not connect to the product database.");
+    return;
   }
+
+  const { data, error } = await db
+    .from("products")
+    .select("id,name,price,hours,description,images,status")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    renderPublic([]);
+    msg(publicMsg, "Could not load products. Please try again.");
+    return;
+  }
+
+  renderPublic(data || []);
+  msg(publicMsg, "");
+}
 
   async function getProfile(userId) {
     const { data, error } = await db
