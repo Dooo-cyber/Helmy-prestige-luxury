@@ -204,18 +204,33 @@ details.append(
         node("p", "product-price", `${money(product.price)} EGP`)
       );
 
-      details.append(
-        node(
-          "p",
-          "public-product-description",
-          product.description || "Contact us for details and availability."
-        )
-      );
+      
+details.append(
+  node(
+    "p",
+    "public-product-description",
+    product.description || "Contact us for details and availability."
+  )
+);
 
-      card.append(details);
-      publicList.append(card);
-    });
-  }
+// BUY NOW - WhatsApp contact
+const buyNow = node("a", "buy-now-button", "BUY NOW");
+
+const message =
+  `Hello Helmy Prestige Luxury! I'm interested in ${product.name || "this product"}. ` +
+  `Price: ${money(product.price)} EGP.`;
+
+buyNow.href =
+  "https://wa.me/201117000625?text=" + encodeURIComponent(message);
+
+buyNow.target = "_blank";
+buyNow.rel = "noopener noreferrer";
+
+details.append(buyNow);
+
+card.append(details);
+publicList.append(card);
+
 
   async function publicInventory() {
   if (!db) {
