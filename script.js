@@ -1,61 +1,408 @@
-/* HELMY PRESTIGE — working filters, product details and Supabase staff panel */
+/* HELMY PRESTIGE — OWNER & ADMIN
+   Never put a Supabase service_role key in browser JavaScript. */
 (() => {
 "use strict";
-const SUPABASE_URL="https://fnftfpthzlgkfexnknaw.supabase.co";
-const SUPABASE_KEY="sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
-const MANAGER="201117000625";
-const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const list=$("#publicProductList"), notice=$("#publicInventoryMessage"), login=$(".admin-modal"), loginForm=$("#staffLoginForm"), dash=$(".admin-dashboard"), form=$("#adminProductForm"), staffList=$(".admin-product-list"), save=$("#adminSaveProduct"), ownerForm=$("#ownerCreateAdminForm"), ownerPanel=$("#ownerManagementPanel"), detail=$("#productDetailsModal"), info=$("#detailsInfo"), gallery=$("#detailsGallery");
-$("#currentYear").textContent=new Date().getFullYear();
-let db=null, user=null, role=null, products=[], editingId=null, busy=false, category="all";
-const say=(el,t,type="")=>{if(!el)return;el.textContent=t;el.classList.remove("error","success");if(type)el.classList.add(type)};
-const node=(tag,cls="",text="")=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=String(text);return e};
-const money=v=>v===null||v===undefined||v===""?"Price on request":Number.isFinite(Number(v))?new Intl.NumberFormat("en-US",{maximumFractionDigits:0}).format(Number(v))+" EGP":"Price on request";
-const isStaff=()=>["owner","admin"].includes(role), isOwner=()=>role==="owner";
-const categoryName=k=>({car:"Car",beach_buggy:"Beach Buggy",jet_ski:"Jet Ski",boat:"Boat"}[k]||"Premium Ride");
-const imagesOf=v=>{if(typeof v==="string"){try{v=JSON.parse(v)}catch{v=v.split(/\r?\n|,/)} }if(!Array.isArray(v))v=v?[v]:[];return v.map(x=>String(x||"").trim()).filter(Boolean).map(s=>{try{const u=new URL(s,location.href);return ["http:","https:"].includes(u.protocol)?u.href:""}catch{return ""}}).filter(Boolean)};
-const busyButton=(b,on,label)=>{if(!b)return;if(on){b.dataset.oldText ||= b.textContent;b.disabled=true;b.textContent=label||"PLEASE WAIT..."}else{b.disabled=false;b.textContent=b.dataset.oldText||b.textContent}};
-/* Intro, menu and login buttons */
-const intro=$("#introScreen"), enter=$("#enterShowroom");
-try{if(sessionStorage.getItem("hpIntroSeen")==="yes"&&intro)intro.hidden=true}catch{}
-enter?.addEventListener("click",()=>{try{sessionStorage.setItem("hpIntroSeen","yes")}catch{}intro.classList.add("is-leaving");setTimeout(()=>{if(intro)intro.hidden=true},650)});
-const menu=$(".mobile-menu-toggle"), nav=$("#mainNav");
-menu?.addEventListener("click",()=>{const open=nav.classList.toggle("nav-open");menu.setAttribute("aria-expanded",String(open))});
-$$(".main-nav a").forEach(a=>a.addEventListener("click",()=>{nav.classList.remove("nav-open");menu?.setAttribute("aria-expanded","false")}));
-function openLogin(){if(login){login.hidden=false;document.body.classList.add("staff-login-open");$("#staffEmail")?.focus()}}
-function closeLogin(){if(login)login.hidden=true;document.body.classList.remove("staff-login-open")}
-$$(".staff-login-trigger").forEach(b=>b.addEventListener("click",openLogin));
-$(".admin-close")?.addEventListener("click",closeLogin);$(".admin-modal-backdrop")?.addEventListener("click",closeLogin);
-/* Filter buttons: one shared state drives all displayed cards */
-function filtered(){return category==="all"?products:products.filter(p=>String(p.category||"").toLowerCase()===category)}
-function paintFilters(){$$("[data-category]").forEach(b=>{const on=b.dataset.category===category;b.classList.toggle("active",on);b.setAttribute("aria-pressed",String(on))})}
-$$("[data-category]").forEach(b=>b.addEventListener("click",()=>{category=b.dataset.category||"all";paintFilters();renderPublic(filtered())}));
-function renderPublic(arr){if(!list)return;list.replaceChildren();if(!arr.length){list.append(node("p","loading-copy",category==="all"?"No inventory is currently listed. Contact our team for availability.":`No ${categoryName(category)} listings found.`));return}
-arr.forEach(p=>{const card=node("article","public-product-card");card.tabIndex=0;card.setAttribute("role","button");card.setAttribute("aria-label","View "+(p.name||"product"));const imgs=imagesOf(p.images);if(imgs[0]){const im=node("img","public-product-image");im.src=imgs[0];im.alt=p.name||"Product";im.loading="lazy";im.onerror=()=>{im.onerror=null;im.replaceWith(node("div","public-product-image-placeholder","IMAGE UNAVAILABLE"))};card.append(im)}else card.append(node("div","public-product-image-placeholder","HELMY PRESTIGE"));const body=node("div","public-product-details");body.append(node("span","product-category",categoryName(p.category)),node("h3","",p.name||"Premium Ride"),node("p","product-price",money(p.price)));const meta=[];if(p.year)meta.push(p.year);if(p.hours!==null&&p.hours!==undefined&&p.hours!=="")meta.push(p.hours+" engine hours");if(p.mileage)meta.push(p.mileage+" km");if(meta.length)body.append(node("p","product-meta",meta.join(" · ")));body.append(node("p","public-product-description",p.description||"Contact us for details and availability."),node("span","product-open-hint","VIEW DETAILS ↗"));card.append(body);card.addEventListener("click",()=>showDetails(p,true));card.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showDetails(p,true)}});list.append(card)})}
-function detailsUrl(p){const u=new URL(location.href);u.hash=p.id?"product="+encodeURIComponent(p.id):"inventory";return u.href}
-function showDetails(p,push){if(!detail||!info||!gallery)return;info.replaceChildren();gallery.replaceChildren();info.append(node("p","eyebrow",categoryName(p.category).toUpperCase()),node("h2","",p.name||"Premium Ride"),node("p","details-price",money(p.price)),node("p","details-description",p.description||"Contact our team for details and availability."));const specs=[["Category",categoryName(p.category)],["Year",p.year||"Not specified"],["Engine hours",p.hours??"Not specified"],["Mileage",p.mileage?`${p.mileage} km`:"Not specified"],["Horsepower",p.horsepower||"Not specified"]],grid=node("div","details-specs");specs.forEach(([a,b])=>{const s=node("div","details-spec");s.append(node("small","",a),node("strong","",b));grid.append(s)});info.append(grid);const href=detailsUrl(p),text=`Hello Helmy Prestige, I'm interested in ${p.name||"this product"}. Price: ${money(p.price)}. Details: ${href}`,buy=node("a","button details-buy","BUY NOW ON WHATSAPP");buy.href="https://wa.me/"+MANAGER+"?text="+encodeURIComponent(text);buy.target="_blank";buy.rel="noopener";info.append(buy);
-const imgs=imagesOf(p.images);if(imgs.length){const main=node("img","details-main-image");main.src=imgs[0];main.alt=p.name||"Product";main.onerror=()=>{main.onerror=null;main.replaceWith(node("div","public-product-image-placeholder details-main-image","IMAGE UNAVAILABLE"))};gallery.append(main);if(imgs.length>1){const thumbs=node("div","details-thumbnails");imgs.forEach((src,i)=>{const b=node("button",i===0?"active":"");b.type="button";const im=node("img");im.src=src;im.alt="Product image "+(i+1);im.onerror=()=>b.hidden=true;b.append(im);b.addEventListener("click",()=>{const target=$(".details-main-image",gallery);if(target?.tagName==="IMG")target.src=src;$$("button",thumbs).forEach(x=>x.classList.toggle("active",x===b))});thumbs.append(b)});gallery.append(thumbs)}}else gallery.append(node("div","public-product-image-placeholder details-main-image","IMAGE NOT AVAILABLE"));
-detail.hidden=false;document.body.classList.add("details-open");if(push&&p.id)history.pushState({productId:p.id},"","#product="+encodeURIComponent(p.id))}
-function closeDetails(changeUrl=true){if(detail)detail.hidden=true;document.body.classList.remove("details-open");if(changeUrl&&location.hash.startsWith("#product="))history.pushState({},"","#inventory")}
-$$("[data-close-details]").forEach(b=>b.addEventListener("click",()=>closeDetails(true)));
-function handleHash(){if(!location.hash.startsWith("#product=")){if(detail&&!detail.hidden)closeDetails(false);return}const id=decodeURIComponent(location.hash.slice(9));const p=products.find(x=>String(x.id)===id);if(p)showDetails(p,false)}
-window.addEventListener("popstate",handleHash);window.addEventListener("hashchange",handleHash);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(detail&&!detail.hidden)closeDetails(true);else if(login&&!login.hidden)closeLogin()}});
-/* Live Supabase products. Do not replace a database error with fake/demo inventory. */
-async function loadPublic(){if(!db){say(notice,"Supabase connection is unavailable.","error");list.replaceChildren(node("p","loading-copy","Live inventory is temporarily unavailable."));return}list.replaceChildren(node("p","loading-copy","Loading collection..."));const {data,error}=await db.from("products").select("*").order("created_at",{ascending:false});if(error){console.error(error);say(notice,"Unable to load live inventory. Please try again later.","error");list.replaceChildren(node("p","loading-copy","Inventory is temporarily unavailable."));return}products=Array.isArray(data)?data:[];say(notice,"");renderPublic(filtered());handleHash()}
-async function getProfile(id){const {data,error}=await db.from("profiles").select("id,email,role").eq("id",id).maybeSingle();if(error)throw error;if(!data||!["owner","admin"].includes(String(data.role||"").toLowerCase()))throw Error("This account has no authorized staff role.");data.role=String(data.role).toLowerCase();return data}
-async function loadStaff(){if(!isStaff()||!staffList)return;staffList.replaceChildren(node("p","","Loading inventory..."));const {data,error}=await db.from("products").select("*").order("created_at",{ascending:false});if(error){console.error(error);staffList.replaceChildren(node("p","","Unable to load products. Check Supabase permissions."));return}products=Array.isArray(data)?data:[];renderStaff();renderPublic(filtered());handleHash()}
-function renderStaff(){staffList.replaceChildren();if(!products.length){staffList.append(node("p","","No products in the database yet."));return}products.forEach(p=>{const card=node("article","admin-product-item");card.append(node("h4","",p.name||"Untitled"),node("p","","Price: "+money(p.price)),node("p","","Category: "+categoryName(p.category)),node("p","","Hours: "+(p.hours??"Not specified")));const actions=node("div","admin-product-item-actions"),edit=node("button","","EDIT"),del=node("button","","DELETE");edit.type=del.type="button";edit.addEventListener("click",()=>editProduct(p));del.addEventListener("click",()=>deleteProduct(p.id,p.name));actions.append(edit,del);card.append(actions);staffList.append(card)})}
-async function showDashboard(profile){user=(await db.auth.getUser()).data.user;role=profile.role;dash.hidden=false;closeLogin();$("[data-staff-email]").textContent=profile.email||user?.email||"";$("[data-staff-role]").textContent=role.toUpperCase();$$(".owner-only").forEach(x=>x.hidden=!isOwner());if(ownerPanel)ownerPanel.hidden=!isOwner();await loadStaff()}
-function editProduct(p){editingId=p.id;const vals={name:p.name,price:p.price,hours:p.hours,category:p.category||"jet_ski",year:p.year,mileage:p.mileage,horsepower:p.horsepower,description:p.description,images:imagesOf(p.images).join("\n")};Object.entries(vals).forEach(([k,v])=>{const f=form.elements.namedItem(k);if(f)f.value=v??""});save.textContent="UPDATE PRODUCT";say($(".form-message",form),"Editing selected product.");form.scrollIntoView({behavior:"smooth",block:"center"})}
-function readProduct(){const val=k=>form.elements.namedItem(k)?.value??"",name=val("name").trim(),price=val("price"),images=val("images").trim()?val("images").trim().split(/\r?\n/).map(x=>x.trim()).filter(Boolean):[];if(!name)throw Error("Enter a product name.");if(price===""||!Number.isFinite(+price)||+price<0)throw Error("Enter a valid price.");images.forEach(s=>{let u;try{u=new URL(s)}catch{throw Error("Each image must be a full http/https URL.")}if(!["http:","https:"].includes(u.protocol))throw Error("Image URLs must use HTTP or HTTPS.")});const num=k=>val(k)===""?null:Number(val(k));return{name,price:Number(price),hours:num("hours"),category:val("category")||"jet_ski",year:num("year"),mileage:num("mileage"),horsepower:num("horsepower"),description:val("description").trim(),images}}
-form?.addEventListener("submit",async e=>{e.preventDefault();if(!isStaff()||busy)return;busy=true;busyButton(save,true,"SAVING...");const status=$(".form-message",form);say(status,"");try{const payload=readProduct(),result=editingId?await db.from("products").update(payload).eq("id",editingId).select().single():await db.from("products").insert(payload).select().single();if(result.error)throw result.error;editingId=null;form.reset();save.textContent="SAVE PRODUCT";say(status,"Product saved.","success");await loadStaff()}catch(err){console.error(err);say(status,err.message||"Could not save product.","error")}finally{busy=false;busyButton(save,false)}});
-async function deleteProduct(id,name){if(!isStaff()||busy||!confirm(`Delete "${name||"this product"}"? This cannot be undone.`))return;busy=true;try{const {error}=await db.from("products").delete().eq("id",id);if(error)throw error;await loadStaff()}catch(err){console.error(err);alert(err.message||"Could not delete product")}finally{busy=false}}
-$$("[data-cancel-product]").forEach(b=>b.addEventListener("click",()=>{editingId=null;form.reset();save.textContent="SAVE PRODUCT";say($(".form-message",form),"")}));
-loginForm?.addEventListener("submit",async e=>{e.preventDefault();if(!db){say($(".form-message",loginForm),"Supabase client unavailable. Refresh the page.","error");return}if(busy)return;busy=true;busyButton($("#staffLoginSubmit"),true,"SIGNING IN...");try{const {data,error}=await db.auth.signInWithPassword({email:loginForm.elements.email.value.trim(),password:loginForm.elements.password.value});if(error)throw error;await showDashboard(await getProfile(data.user.id));say($(".form-message",loginForm),"")}catch(err){console.error(err);await db.auth.signOut();say($(".form-message",loginForm),err.message||"Sign in failed.","error")}finally{busy=false;busyButton($("#staffLoginSubmit"),false)}});
-async function logout(){const {error}=await db.auth.signOut();if(error){alert(error.message);return}user=null;role=null;dash.hidden=true;form.reset();openLogin()}
-$$("[data-staff-logout]").forEach(b=>b.addEventListener("click",logout));
-ownerForm?.addEventListener("submit",async e=>{e.preventDefault();const status=$(".form-message",ownerForm);if(!isOwner()){say(status,"Only the Owner can create admins.","error");return}if(busy)return;const email=ownerForm.elements.email.value.trim(),password=ownerForm.elements.password.value;if(password.length<12){say(status,"Password must be at least 12 characters.","error");return}busy=true;const b=$('button[type="submit"]',ownerForm);busyButton(b,true,"CREATING...");try{const {data,error}=await db.functions.invoke("create-admin",{body:{email,password}});if(error)throw error;if(data?.error)throw Error(data.error);ownerForm.reset();say(status,"Admin account created successfully.","success")}catch(err){console.error(err);say(status,err.message||"Could not create admin. Check the create-admin Edge Function.","error")}finally{busy=false;busyButton(b,false)}});
-async function init(){if(window.supabase)db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});paintFilters();if(!db){say(notice,"Supabase client did not load.","error");return}await loadPublic();const {data:{session}}=await db.auth.getSession();if(session?.user){try{await showDashboard(await getProfile(session.user.id))}catch(e){console.error(e);await db.auth.signOut()}}db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT"){user=null;role=null;dash.hidden=true}else if(event==="SIGNED_IN"&&session?.user){setTimeout(async()=>{try{await showDashboard(await getProfile(session.user.id))}catch(e){console.error(e);await db.auth.signOut()}},0)}})}
-init().catch(e=>{console.error(e);say(notice,"Unable to connect to live inventory.","error");list.replaceChildren(node("p","loading-copy","Inventory is temporarily unavailable."))});
-})();
+
+const SUPABASE_URL = "https://fnftfpthzlgkfexnknaw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+const publicList = $("#publicProductList");
+const publicMsg = $("#publicInventoryMessage");
+const modal = $(".admin-modal");
+const loginForm = $("#staffLoginForm");
+const dashboard = $(".admin-dashboard");
+const productForm = $("#adminProductForm");
+const productList = $(".admin-product-list");
+const saveButton = $("#adminSaveProduct");
+const createAdminForm = $("#ownerCreateAdminForm");
+const ownerPanel = $("#ownerManagementPanel");
+
+$("#currentYear").textContent = new Date().getFullYear();
+
+const demo = [
+  {
+    name:"RXP-X RS 2022", category:"jet_ski", year:2022,
+    mileage:null, horsepower:null, price:1150000, hours:100,
+    description:"Premium personal watercraft.",
+    images:["IMG_2815.jpeg","IMG_2814.jpeg","IMG_2813.jpeg"]
+  },
+  {
+    name:"RXT-X RS 2018", category:"jet_ski", year:2018,
+    mileage:null, horsepower:null, price:750000, hours:85,
+    description:"Premium personal watercraft.",
+    images:["IMG_2812.jpeg","IMG_2811.jpeg"]
+  },
+  {
+    name:"RXP-X RS 2025", category:"jet_ski", year:2025,
+    mileage:null, horsepower:null, price:1250000, hours:128,
+    description:"Premium personal watercraft.",
+    images:["IMG_2809.jpeg","IMG_2810.jpeg"]
+  },
+  {
+    name:"GTX Limited 2024", category:"jet_ski", year:2024,
+    mileage:null, horsepower:null, price:1050000, hours:110,
+    description:"Premium personal watercraft.",
+    images:["IMG_2721.jpeg","IMG_2720.jpeg"]
+  }
+];
+
+let db = null;
+let user = null;
+let role = null;
+let items = [];
+let editingId = null;
+let busy = false;
+let selectedCategory = "all";
+let demoMode = false;
+
+const categories = {
+  car:"CAR",
+  beach_buggy:"BEACH BUGGY",
+  jet_ski:"JET SKI",
+  boat:"BOAT"
+};
+
+function normalizeCategory(value) {
+  const key = String(value || "all")
+    .trim().toLowerCase().replace(/[\s-]+/g, "_");
+
+  const aliases = {
+    all:"all",
+    car:"car", cars:"car",
+    beach_buggy:"beach_buggy",
+    beach_buggies:"beach_buggy",
+    buggy:"beach_buggy", buggies:"beach_buggy",
+    jet_ski:"jet_ski", jet_skis:"jet_ski",
+    jetski:"jet_ski", jetskis:"jet_ski",
+    boat:"boat", boats:"boat"
+  };
+
+  return aliases[key] || "all";
+}
+
+function visibleProducts(list) {
+  return selectedCategory === "all"
+    ? list
+    : list.filter(p =>
+        normalizeCategory(p.category || "jet_ski") === selectedCategory
+      );
+}
+
+function setCategory(value) {
+  selectedCategory = normalizeCategory(value);
+
+  $$("[data-category], [data-filter], .category-button").forEach(button => {
+    const raw = button.dataset.category ||
+      button.dataset.filter || button.value || button.textContent;
+
+    const active = normalizeCategory(raw) === selectedCategory;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  renderPublic(demoMode ? demo : items);
+}
+
+document.addEventListener("click", event => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+
+  const button = target.closest(
+    ".category-filters [data-category], #categoryFilter button, " +
+    "#categoryFilter [data-category], #categoryFilter [data-filter], " +
+    ".category-button[data-category]"
+  );
+
+  if (!button) return;
+
+  const raw = button.dataset.category ||
+    button.dataset.filter || button.value || button.textContent;
+
+  event.preventDefault();
+  setCategory(raw);
+});
+
+const msg = (el, text, type = "") => {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove("error", "success");
+  if (type) el.classList.add(type);
+};
+
+const money = n =>
+  Number.isFinite(Number(n))
+    ? new Intl.NumberFormat("en-US", {
+        maximumFractionDigits:0
+      }).format(Number(n))
+    : "Price on request";
+
+const staff = () => role === "owner" || role === "admin";
+const owner = () => role === "owner";
+
+function node(tag, cls, text) {
+  const element = document.createElement(tag);
+  if (cls) element.className = cls;
+  if (text !== undefined) element.textContent = String(text);
+  return element;
+}
+
+function toggleBusy(button, on, label = "PLEASE WAIT...") {
+  if (!button) return;
+
+  if (on) {
+    button.dataset.oldText ||= button.textContent;
+    button.textContent = label;
+    button.disabled = true;
+  } else {
+    button.textContent = button.dataset.oldText || button.textContent;
+    button.disabled = false;
+  }
+}
+
+function openLogin() {
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.classList.add("staff-login-open");
+  $("#staffEmail")?.focus();
+}
+
+function closeLogin() {
+  if (modal) modal.hidden = true;
+  document.body.classList.remove("staff-login-open");
+}
+
+$$(".staff-login-trigger").forEach(button =>
+  button.addEventListener("click", openLogin)
+);
+
+$$(".admin-close").forEach(button =>
+  button.addEventListener("click", closeLogin)
+);
+
+$(".admin-modal-backdrop")?.addEventListener("click", closeLogin);
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && modal && !modal.hidden) closeLogin();
+});
+
+function validImage(src) {
+  try {
+    const url = new URL(src, location.href);
+    return ["https:", "http:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+function productImages(product) {
+  if (Array.isArray(product?.images)) return product.images;
+
+  if (typeof product?.images === "string") {
+    try {
+      const parsed = JSON.parse(product.images);
+      return Array.isArray(parsed)
+        ? parsed
+        : product.images.split(/\n+/).filter(Boolean);
+    } catch {
+      return product.images.split(/\n+/).filter(Boolean);
+    }
+  }
+
+  return [];
+}
+
+/* BUY NOW opens WhatsApp with product details */
+const whatsappUrl = product =>
+  `https://wa.me/201117000625?text=${encodeURIComponent(
+    `Hello, I want to buy ${product.name || "this product"}. ` +
+    `Price: ${money(product.price)} EGP. Please confirm availability.`
+  )}`;
+
+/* Product details gallery */
+function showProductDetails(product) {
+  const detailsModal = $("#productDetailsModal");
+  const gallery = $("#detailsGallery");
+  const info = $("#detailsInfo");
+
+  if (!detailsModal || !gallery || !info) return;
+
+  gallery.replaceChildren();
+  info.replaceChildren();
+
+  const images = productImages(product).map(validImage).filter(Boolean);
+  let index = 0;
+
+  const main = node("img", "details-main-image");
+  main.alt = product.name || "Product";
+
+  if (images.length) {
+    main.src = images[0];
+  } else {
+    main.alt = "No product image available";
+    main.classList.add("no-image");
+  }
+
+  const zoom = node("button", "gallery-zoom", "⤢ ZOOM");
+  zoom.type = "button";
+  zoom.setAttribute("aria-label", "Zoom product image");
+
+  const thumbs = node("div", "gallery-thumbnails");
+
+  const updateImage = () => {
+    if (images.length) main.src = images[index];
+
+    thumbs.querySelectorAll("img").forEach((image, i) => {
+      image.classList.toggle("selected", i === index);
+    });
+  };
+
+  main.addEventListener("click", () =>
+    main.classList.toggle("zoomed")
+  );
+
+  zoom.addEventListener("click", () =>
+    main.classList.toggle("zoomed")
+  );
+
+  /* Swipe left and right on touchscreens */
+  let startX = null;
+
+  main.addEventListener("pointerdown", event => {
+    startX = event.clientX;
+  });
+
+  main.addEventListener("pointerup", event => {
+    if (startX === null || images.length < 2) return;
+
+    const delta = event.clientX - startX;
+    startX = null;
+
+    if (Math.abs(delta) > 35) {
+      index = (index + (delta < 0 ? 1 : -1) + images.length) % images.length;
+      main.classList.remove("zoomed");
+      updateImage();
+    }
+  });
+
+  if (images.length > 1) {
+    const controls = node("div", "gallery-controls");
+    const previous = node("button", "", "‹ PREVIOUS VIEW");
+    const next = node("button", "", "NEXT VIEW ›");
+
+    previous.type = next.type = "button";
+
+    previous.addEventListener("click", () => {
+      index = (index + images.length - 1) % images.length;
+      main.classList.remove("zoomed");
+      updateImage();
+    });
+
+    next.addEventListener("click", () => {
+      index = (index + 1) % images.length;
+      main.classList.remove("zoomed");
+      updateImage();
+    });
+
+    images.forEach((src, i) => {
+      const image = node("img", "details-thumbnail");
+      image.src = src;
+      image.alt = `${product.name || "Product"} angle ${i + 1}`;
+
+      image.addEventListener("click", () => {
+        index = i;
+        main.classList.remove("zoomed");
+        updateImage();
+      });
+
+      thumbs.append(image);
+    });
+
+    controls.append(previous, next);
+    updateImage();
+    gallery.append(main, zoom, controls, thumbs);
+  } else {
+    gallery.append(main, zoom);
+  }
+
+  const status = String(product.status || "available").toLowerCase();
+  const sold = status === "sold_out" || status === "sold out";
+
+  const badge = node(
+    "span",
+    `details-status${sold ? " sold-out" : ""}`,
+    sold ? "● SOLD OUT" : "● AVAILABLE"
+  );
+
+  info.append(
+    node("p", "eyebrow",
+      categories[normalizeCategory(product.category)] || "PREMIUM INVENTORY"
+    ),
+    node("h2", "", product.name || "Product"),
+    node("p", "details-price", `${money(product.price)} EGP`),
+    badge,
+    node("p", "", product.description ||
+      "Contact our team for full details and availability.")
+  );
+
+  const specs = node("div", "details-specs");
+
+  [
+    ["Category", categories[normalizeCategory(product.category)] || "Premium"],
+    ["Year", product.year],
+    ["Engine hours", product.hours],
+    ["Mileage", product.mileage != null ? `${product.mileage} km` : null],
+    ["Horsepower", product.horsepower ? `${product.horsepower} HP` : null]
+  ].forEach(([label, value]) => {
+    if (value === null || value === undefined || value === "") return;
+
+    const cell = node("div");
+    cell.append(node("span", "", label), node("strong", "", value));
+    specs.append(cell);
+  });
+
+  if (specs.childElementCount) info.append(specs);
+
+  const quantity = Number.isFinite(Number(product.quantity))
+    ? Math.max(0, Number(product.quantity))
+    : 1;
+
+  info.append(node("p", "details-quantity", `Available quantity: ${quantity}`));
+
+  const buy = node("a", "button details-buy", "BUY NOW  ↗");
+  buy.href = whatsappUrl(product);
+  buy.target = "_blank";
+  buy.rel = "noopener noreferrer";
+
+  if (sold || quantity === 0) {
+    buy.classList.add("is-disabled");
+    buy.setAttribute("aria-disabled", "true");
+    buy.textContent = "CURRENTLY SOLD OUT";
+    buy.href = "#";
+    buy.addEventListener("click", event => event.preventDefault());
+  }
+
+  info.append(buy);
+
+  detailsModal.hidden = false;
+  document.body.classList.add("details-open");
+}
+
+function closeProductDetails() {
+  const detailsModal = $("#productDetailsModal");
+  if (detailsModal) detailsModal.hidden = true;
+  document.body.classList.remove("details-open");
+}
+
+document.addEventListener("click", event => {
+  if (event.target instanceof Element &&
+      event.target.closest("[data-close-details]")) {
+    closeProductDetails();
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeProductDetails();
+});
