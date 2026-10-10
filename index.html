@@ -1,264 +1,239 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#08090b">
-  <title>HELMY PRESTIGE LUXURY</title>
-  <meta name="description" content="Discover the finest selection of luxury cars, beach buggies, jet skis and boats at Helmy Prestige Luxury.">
-  <link rel="stylesheet" href="style.css?v=4">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080b0f">
+<title>Helmy Prestige | Premium Watercraft</title>
+<link rel="stylesheet" href="style.css?v=20261010">
 </head>
 <body>
 
-  <!-- WELCOME SCREEN -->
-  <section class="intro-screen" id="introScreen">
-    <div class="intro-overlay"></div>
-    <div class="intro-content">
-      <div class="intro-monogram">HP</div>
-      <p class="intro-eyebrow">THE ART OF EXCEPTIONAL LIVING</p>
-      <h1>HELMY <span>PRESTIGE</span></h1>
-      <p class="intro-subtitle">LUXURY • PERFORMANCE • PRESTIGE</p>
-      <button class="enter-showroom" id="enterShowroom" type="button">
-        ENTER SHOWROOM <span>↗</span>
-      </button>
+<div id="introScreen" class="intro-screen">
+  <div class="intro-overlay"></div>
+  <div class="intro-content">
+    <div class="intro-monogram">
+      <img src="Show%20room/CC778CD6-1B21-4A58-A8DA-84B3FD7837F3.png" alt="Helmy Prestige logo">
     </div>
-    <div class="intro-bottom">EXCLUSIVE COLLECTION · EST. HP</div>
+    <p class="intro-eyebrow">WELCOME TO</p>
+    <h1>HELMY <span>PRESTIGE</span></h1>
+    <p class="intro-subtitle">THE ART OF PREMIUM RIDES</p>
+    <button id="enterShowroom" class="button enter-showroom">ENTER SHOWROOM</button>
+  </div>
+</div>
+
+<header class="site-header">
+  <a class="brand" href="#home">
+    <img class="brand-logo" src="Show%20room/CC778CD6-1B21-4A58-A8DA-84B3FD7837F3.png" alt="Helmy Prestige">
+    <span class="brand-copy">
+      <strong>HELMY PRESTIGE</strong>
+      <small>PREMIUM WATERCRAFT</small>
+    </span>
+  </a>
+  <nav class="main-nav">
+    <a href="#inventory">Inventory</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <button class="staff-login-trigger header-cta" type="button">STAFF LOGIN</button>
+</header>
+
+<main id="home">
+  <section class="showroom-hero">
+    <div class="hero-content">
+      <p class="eyebrow">THE ART OF WATER</p>
+      <h1>Ride Beyond<br><em>Ordinary.</em></h1>
+      <p class="hero-copy">A curated collection of premium Sea-Doo personal watercraft.</p>
+      <a class="button" href="#inventory">EXPLORE COLLECTION</a>
+    </div>
+    <p class="hero-caption">HELMY PRESTIGE — EST. FOR THE EXTRAORDINARY</p>
   </section>
 
-  <!-- HEADER -->
-  <header class="site-header">
-    <a class="brand" href="#home" aria-label="Helmy Prestige Luxury home">
-      <span class="brand-monogram">HP</span>
-      <span class="brand-copy">
-        <strong>HELMY PRESTIGE</strong>
-        <small>L U X U R Y</small>
-      </span>
-    </a>
+  <section class="inventory-section" id="inventory">
+    <div class="collection-heading">
+      <div>
+        <p class="eyebrow">THE COLLECTION</p>
+        <h2>Featured <em>Inventory</em></h2>
+      </div>
+      <p>Selected machines. Exceptional experiences.</p>
+    </div>
 
-    <nav class="main-nav">
-      <a href="#home">HOME</a>
-      <a href="#collection">COLLECTION</a>
-      <a href="#about">ABOUT</a>
-      <a href="#contact">CONTACT</a>
-    </nav>
+    <div class="category-filters" aria-label="Filter products">
+      <button type="button" class="active" data-category="all">All</button>
+      <button type="button" data-category="car">Cars</button>
+      <button type="button" data-category="beach_buggy">Beach Buggies</button>
+      <button type="button" data-category="jet_ski">Jet Skis</button>
+      <button type="button" data-category="boat">Boats</button>
+    </div>
 
-    <a class="header-cta" href="#collection">EXPLORE COLLECTION</a>
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Open navigation">☰</button>
+    <div id="publicProductList" class="public-product-list" aria-live="polite"></div>
+    <p id="publicInventoryMessage" class="notice" role="status"></p>
+  </section>
+
+  <section class="about-section" id="about">
+    <div>
+      <p class="eyebrow">THE HELMY STANDARD</p>
+      <h2>Performance.<br><em>Without Compromise.</em></h2>
+    </div>
+    <p>Helmy Prestige brings together carefully selected personal watercraft for riders who value performance, condition and distinction. Contact our team for availability and viewing details.</p>
+  </section>
+
+  <section class="contact-section" id="contact">
+    <p class="eyebrow">MAKE YOUR NEXT MOVE</p>
+    <h2>Find Your <em>Ride.</em></h2>
+
+    <div class="contact-grid">
+      <article class="contact-card">
+        <img class="contact-person-image" src="IMG_3354.jpeg" alt="Mohamed Helmy - Owner" loading="lazy">
+        <p class="eyebrow">OWNER</p>
+        <h3>Mohamed Helmy</h3>
+        <p>For ownership and business inquiries.</p>
+        <a href="https://wa.me/201115000225" target="_blank" rel="noopener">WhatsApp: +20 111 500 0225</a>
+        <a href="tel:+201115000225">Call Owner</a>
+      </article>
+
+      <article class="contact-card">
+        <img class="contact-person-image" src="IMG_1363.jpg" alt="Omar Helmy - Manager" loading="lazy">
+        <p class="eyebrow">MANAGER</p>
+        <h3>Omar Helmy</h3>
+        <p>For inventory and sales inquiries.</p>
+        <a href="https://wa.me/201117000625" target="_blank" rel="noopener">WhatsApp: +20 111 700 0625</a>
+        <a href="tel:+201117000625">Call Manager</a>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <a class="brand" href="#home">
+    <img class="brand-logo" src="Show%20room/CC778CD6-1B21-4A58-A8DA-84B3FD7837F3.png" alt="Helmy Prestige">
+    <span class="brand-copy">
+      <strong>HELMY PRESTIGE</strong>
+      <small>PREMIUM WATERCRAFT</small>
+    </span>
+  </a>
+  <p>© <span id="currentYear"></span> Helmy Prestige. All rights reserved.</p>
+  <p>Website by Adam Helmy</p>
+</footer>
+
+<div class="admin-modal" hidden>
+  <div class="admin-modal-backdrop"></div>
+  <section class="admin-modal-content" role="dialog" aria-modal="true" aria-labelledby="staffLoginTitle">
+    <button class="admin-modal-close admin-close" type="button" aria-label="Close login">&times;</button>
+    <p class="eyebrow">RESTRICTED ACCESS</p>
+    <h2 id="staffLoginTitle">Staff <em>Login</em></h2>
+    <p>Sign in with your authorized staff account.</p>
+
+    <form id="staffLoginForm">
+      <label for="staffEmail">EMAIL</label>
+      <input id="staffEmail" name="email" type="email" autocomplete="username" required placeholder="you@example.com">
+      <label for="staffPassword">PASSWORD</label>
+      <input id="staffPassword" name="password" type="password" autocomplete="current-password" required placeholder="Your password">
+      <button id="staffLoginSubmit" class="button" type="submit">SIGN IN</button>
+      <p class="form-message admin-message" aria-live="polite"></p>
+    </form>
+    <p class="admin-security-note">Access is limited to approved staff accounts. Permissions are checked against the secured database.</p>
+  </section>
+</div>
+
+<section class="admin-dashboard" hidden aria-label="Staff dashboard">
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">HELMY PRESTIGE / CONTROL PANEL</p>
+      <h2>Staff <em>Dashboard</em></h2>
+      <p>Signed in as <strong data-staff-email></strong> · <span class="staff-role-badge" data-staff-role></span></p>
+    </div>
+    <button class="admin-secondary-button" type="button" data-staff-logout>LOG OUT</button>
   </header>
 
-  <!-- SHOWROOM INTERIOR BANNER -->
-  <section class="showroom-hero" aria-label="Luxury showroom interior">
-    <div class="showroom-hero-overlay"></div>
-    <div class="showroom-hero-content">
-      <p>WELCOME TO</p>
-      <h2>HELMY PRESTIGE <span>LUXURY</span></h2>
-      <span>WHERE EXCELLENCE MEETS EXCLUSIVITY</span>
-      <a href="#collection" class="silver-button">DISCOVER THE COLLECTION</a>
-    </div>
-  </section>
+  <div class="admin-dashboard-content">
+    <section class="admin-product-form">
+      <p class="eyebrow">INVENTORY MANAGEMENT</p>
+      <h3>Manage Products</h3>
+      <p>Changes are saved in Supabase. Use public HTTPS image URLs.</p>
 
-  <main id="home">
+      <form id="adminProductForm">
+        <label for="productName">PRODUCT NAME</label>
+        <input id="productName" name="name" maxlength="120" required>
 
-    <!-- COLLECTION INTRO -->
-    <section class="collection-heading" id="collection">
-      <p class="section-eyebrow">CURATED FOR THE EXTRAORDINARY</p>
-      <h2>THE <span>COLLECTION</span></h2>
-      <p class="section-description">
-        A world of exceptional machines, refined design and unforgettable experiences.
-      </p>
-      <div class="heading-line"></div>
-    </section>
+        <label for="productPrice">PRICE (EGP)</label>
+        <input id="productPrice" name="price" type="number" min="0" step="1" required>
 
-    <!-- CATEGORY FILTERS -->
-    <section class="collection-controls">
-      <div class="category-filters" role="group" aria-label="Filter collection">
-        <button class="filter-btn active" type="button" data-category="all">ALL COLLECTION</button>
-        <button class="filter-btn" type="button" data-category="car">LUXURY CARS</button>
-        <button class="filter-btn" type="button" data-category="beach_buggy">BEACH BUGGIES</button>
-        <button class="filter-btn" type="button" data-category="jet_ski">JET SKIS</button>
-        <button class="filter-btn" type="button" data-category="boat">LUXURY BOATS</button>
-      </div>
-    </section>
+        <label for="productHours">ENGINE HOURS</label>
+        <input id="productHours" name="hours" type="number" min="0" step="1">
 
-    <!-- PUBLIC INVENTORY -->
-    <section class="inventory-section">
-      <div class="inventory-topline">
-        <span>THE PRESTIGE SELECTION</span>
-        <span class="inventory-live"><i></i> EXCLUSIVE INVENTORY</span>
-      </div>
+        <label for="productCategory">CATEGORY</label>
+        <select id="productCategory" name="category">
+          <option value="jet_ski">Jet Ski</option>
+          <option value="car">Car</option>
+          <option value="beach_buggy">Beach Buggy</option>
+          <option value="boat">Boat</option>
+        </select>
 
-      <p class="inventory-message" id="publicInventoryMessage">
-        Discover our exclusive collection.
-      </p>
+        <label for="productYear">YEAR</label>
+        <input id="productYear" name="year" type="number" min="1900" max="2100">
 
-      <div class="public-product-list" id="publicProductList">
-        <!-- Products are loaded from Supabase by script.js -->
-      </div>
-    </section>
+        <label for="productMileage">MILEAGE (KM)</label>
+        <input id="productMileage" name="mileage" type="number" min="0">
 
-    <!-- ABOUT -->
-    <section class="about-section" id="about">
-      <div class="about-decoration">HP</div>
-      <div class="about-content">
-        <p class="section-eyebrow">OUR PHILOSOPHY</p>
-        <h2>MORE THAN A PURCHASE.<br><span>A STATEMENT.</span></h2>
-        <p>
-          Helmy Prestige Luxury brings together an exclusive world of luxury cars,
-          beach buggies, jet skis and boats. Every selection reflects our passion
-          for quality, performance and exceptional style.
-        </p>
-        <a href="#contact" class="silver-button">CONNECT WITH US</a>
-      </div>
-    </section>
+        <label for="productHorsepower">HORSEPOWER</label>
+        <input id="productHorsepower" name="horsepower" type="number" min="0">
 
-    <!-- CONTACT -->
-    <section class="contact-section" id="contact">
-      <p class="section-eyebrow">PERSONAL ASSISTANCE</p>
-      <h2>YOUR NEXT <span>EXPERIENCE</span> AWAITS.</h2>
-      <p>Contact our team for availability, details and private enquiries.</p>
-      <a class="silver-button" href="https://wa.me/" target="_blank" rel="noopener noreferrer">
-        CONTACT OUR TEAM
-      </a>
-    </section>
+        <label for="productDescription">DESCRIPTION</label>
+        <textarea id="productDescription" name="description" rows="3"></textarea>
 
-  </main>
+        <label for="productImages">IMAGE URLS (one per line)</label>
+        <textarea id="productImages" name="images" rows="3" placeholder="https://example.com/image.jpg"></textarea>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <a class="footer-brand" href="#home">HP</a>
-    <p>HELMY PRESTIGE LUXURY</p>
-    <span>EXCELLENCE WITHOUT COMPROMISE</span>
-    <small>© <span id="currentYear">2026</span> HELMY PRESTIGE LUXURY. ALL RIGHTS RESERVED.</small>
-  </footer>
-
-  <!-- STAFF LOGIN MODAL -->
-  <div class="admin-modal" id="adminModal" aria-hidden="true">
-    <div class="admin-modal-backdrop" data-close-admin></div>
-    <div class="admin-modal-content" role="dialog" aria-modal="true" aria-labelledby="staffLoginTitle">
-      <button class="admin-modal-close" type="button" data-close-admin aria-label="Close">×</button>
-      <p class="section-eyebrow">AUTHORIZED ACCESS</p>
-      <h2 id="staffLoginTitle">STAFF <span>LOGIN</span></h2>
-
-      <form id="staffLoginForm">
-        <label for="staffEmail">Email address</label>
-        <input id="staffEmail" name="email" type="email" autocomplete="username" required>
-
-        <label for="staffPassword">Password</label>
-        <input id="staffPassword" name="password" type="password" autocomplete="current-password" required>
-
-        <button class="silver-button form-submit" type="submit">SIGN IN</button>
-        <p class="form-message" id="staffLoginMessage" aria-live="polite"></p>
+        <div class="admin-form-actions">
+          <button id="adminSaveProduct" class="button" type="submit">SAVE PRODUCT</button>
+          <button class="admin-secondary-button" type="button" data-cancel-product>CANCEL EDIT</button>
+        </div>
+        <p class="form-message admin-message" aria-live="polite"></p>
       </form>
-    </div>
-  </div>
+    </section>
 
-  <!-- STAFF DASHBOARD -->
-  <section class="admin-dashboard" id="adminDashboard" hidden>
-    <div class="dashboard-header">
-      <div>
-        <p class="section-eyebrow">PRIVATE MANAGEMENT</p>
-        <h2>INVENTORY <span>CONTROL</span></h2>
+    <section class="admin-inventory">
+      <p class="eyebrow">CURRENT LISTINGS</p>
+      <h3>Inventory</h3>
+      <div class="admin-product-list" aria-live="polite">
+        <p>Sign in to load inventory.</p>
       </div>
-      <button class="outline-button" id="staffLogout" type="button">SIGN OUT</button>
-    </div>
+    </section>
 
-    <form id="adminProductForm" class="admin-product-form">
-      <h3>ADD OR EDIT PRODUCT</h3>
-      <input type="hidden" id="adminProductId" name="id">
+    <section id="ownerManagementPanel" class="owner-management owner-only" hidden>
+      <p class="eyebrow">OWNER PRIVILEGES</p>
+      <h3>Create Admin Account</h3>
+      <p>Only the Owner can create Admin accounts. The server-side function checks the role.</p>
 
-      <label for="productName">Product name</label>
-      <input id="productName" name="name" type="text" required>
-
-      <label for="productCategory">Category</label>
-      <select id="productCategory" name="category" required>
-        <option value="car">Luxury Cars</option>
-        <option value="beach_buggy">Beach Buggies</option>
-        <option value="jet_ski">Jet Skis</option>
-        <option value="boat">Luxury Boats</option>
-      </select>
-
-      <label for="productPrice">Price</label>
-      <input id="productPrice" name="price" type="text" placeholder="Contact for price">
-
-      <label for="productYear">Year</label>
-      <input id="productYear" name="year" type="text" placeholder="2026">
-
-      <label for="productMileage">Mileage</label>
-      <input id="productMileage" name="mileage" type="text" placeholder="Mileage or hours">
-
-      <label for="productHorsepower">Horsepower / engine</label>
-      <input id="productHorsepower" name="horsepower" type="text" placeholder="Engine details">
-
-      <label for="productDescription">Description</label>
-      <textarea id="productDescription" name="description" rows="5"></textarea>
-
-      <label for="productStatus">Availability</label>
-      <select id="productStatus" name="status">
-        <option value="available">Available</option>
-        <option value="sold">Sold</option>
-      </select>
-
-      <label for="productImages">Product images</label>
-      <input id="productImages" name="images" type="file" accept="image/*" multiple>
-      <div id="productImagePreview" class="product-image-preview"></div>
-
-      <div class="form-actions">
-        <button class="silver-button" id="adminSaveProduct" type="submit">SAVE PRODUCT</button>
-        <button class="outline-button" id="adminCancelEdit" type="button">CANCEL</button>
-      </div>
-      <p id="adminProductMessage" class="form-message" aria-live="polite"></p>
-    </form>
-
-    <div class="admin-inventory">
-      <h3>MANAGE PRODUCTS</h3>
-      <div class="admin-product-list"></div>
-    </div>
-
-    <section class="owner-management" id="ownerManagementPanel" hidden>
-      <h3>OWNER MANAGEMENT</h3>
       <form id="ownerCreateAdminForm">
-        <label for="newAdminEmail">New staff email</label>
+        <label for="newAdminEmail">NEW ADMIN EMAIL</label>
         <input id="newAdminEmail" name="email" type="email" required>
-        <label for="newAdminPassword">Temporary password</label>
-        <input id="newAdminPassword" name="password" type="password" minlength="8" required>
-        <button class="silver-button" type="submit">CREATE STAFF ACCOUNT</button>
+
+        <label for="newAdminPassword">TEMPORARY PASSWORD (12+ CHARACTERS)</label>
+        <input id="newAdminPassword" name="password" type="password" minlength="12" required>
+
+        <div class="admin-form-actions">
+          <button class="button" type="submit">CREATE ADMIN</button>
+        </div>
+        <p class="form-message admin-message" aria-live="polite"></p>
       </form>
-      <p class="form-message" id="ownerManagementMessage" aria-live="polite"></p>
+      <p class="admin-permission-note"><strong>Security:</strong> Never share your Owner login. Admin creation is enforced server-side.</p>
     </section>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<div id="productDetailsModal" class="details-modal" hidden>
+  <div class="details-backdrop" data-close-details></div>
+  <section class="details-content" role="dialog" aria-modal="true" aria-label="Product details">
+    <button type="button" class="close-details" data-close-details aria-label="Close">&times;</button>
+    <div id="detailsGallery" class="details-gallery"></div>
+    <div id="detailsInfo" class="details-info"></div>
   </section>
+</div>
 
-  <!-- The JavaScript creates the product-details modal dynamically. -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=4"></script>
-
-  <script>
-    document.getElementById("currentYear").textContent = new Date().getFullYear();
-
-    const menuToggle = document.getElementById("mobileMenuToggle");
-    const navigation = document.querySelector(".main-nav");
-
-    if (menuToggle && navigation) {
-      menuToggle.addEventListener("click", () => {
-        navigation.classList.toggle("nav-open");
-      });
-
-      navigation.querySelectorAll("a").forEach(link => {
-        link.addEventListener("click", () => navigation.classList.remove("nav-open"));
-      });
-    }
-
-    document.querySelectorAll("[data-close-admin]").forEach(button => {
-      button.addEventListener("click", () => {
-        const modal = document.getElementById("adminModal");
-        if (modal) {
-          modal.classList.remove("open");
-          modal.setAttribute("aria-hidden", "true");
-        }
-      });
-    });
-  </script>
+<script src="script.js?v=20261011"></script>
 </body>
 </html>
