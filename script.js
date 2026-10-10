@@ -229,7 +229,7 @@ buyNow.rel = "noopener noreferrer";
 details.append(buyNow);
 
 
-      card.append(details);
+            card.append(details);
       publicList.append(card);
     });
   }
