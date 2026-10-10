@@ -138,9 +138,16 @@
           <label for="productDescription">DESCRIPTION</label>
           <textarea id="productDescription" name="description" rows="3"></textarea>
 
-          <label for="productImages">IMAGE URLS (one per line)</label>
-          <textarea id="productImages" name="images" rows="3" placeholder="https://example.com/image.jpg"></textarea>
+          <label for="productImages">PRODUCT IMAGES (Choose from your album)</label>
+<input type="file" id="productImages" name="images" accept="image/*" multiple>
+<div id="productImagePreview"></div>
 
+<label for="productStatus">PRODUCT STATUS</label>
+<select id="productStatus" name="status">
+  <option value="available">Available</option>
+  <option value="sold_out">Sold Out</option>
+</select>
+          
           <div class="admin-form-actions">
             <button id="adminSaveProduct" class="button" type="submit">SAVE PRODUCT</button>
             <button class="admin-secondary-button" type="button" data-cancel-product>CANCEL EDIT</button>
