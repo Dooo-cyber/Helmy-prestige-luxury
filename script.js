@@ -459,8 +459,9 @@ card.append(
     const price = productForm.elements.price.value;
     const hours = productForm.elements.hours.value;
     const description = productForm.elements.description.value.trim(); 
-    const imageField = productForm.elements.namedItem("images");
+    const imageField = productForm.querySelector('[name="images"]:not([type="file"])');
     const imageText = imageField ? imageField.value.trim() : "";
+    
 
 
     if (!name) {
