@@ -229,7 +229,7 @@ details.append(
 
     const { data, error } = await db
       .from("products")
-      .select("id,name,price,hours,description,images")
+      .select("id,name,price,hours,description,images,status")
       .order("created_at", { ascending: false });
 
     if (error) {
