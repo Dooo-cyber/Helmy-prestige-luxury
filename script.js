@@ -406,3 +406,640 @@ document.addEventListener("click", event => {
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") closeProductDetails();
 });
+function renderPublic(list) {
+  if (!publicList) return;
+
+  const filtered = visibleProducts(Array.isArray(list) ? list : []);
+  publicList.replaceChildren();
+
+  if (!filtered.length) {
+    publicList.append(node(
+      "p",
+      "loading-copy",
+      "No products in this category yet. Contact our team for availability."
+    ));
+    return;
+  }
+
+  filtered.forEach(product => {
+    const card = node("article", "public-product-card");
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `View details for ${product.name || "product"}`);
+
+    const images = productImages(product);
+    const src = validImage(images[0]);
+
+    if (src) {
+      const image = node("img", "public-product-image");
+      image.src = src;
+      image.alt = product.name || "Vehicle";
+      image.loading = "lazy";
+      image.onerror = () => image.replaceWith(
+        node("div", "public-product-image-placeholder", "IMAGE NOT AVAILABLE")
+      );
+      card.append(image);
+    } else {
+      card.append(node("div", "public-product-image-placeholder", "HELMY PRESTIGE"));
+    }
+
+    const details = node("div", "public-product-details");
+
+    details.append(
+      node("p", "product-meta",
+        categories[normalizeCategory(product.category)] || "PREMIUM INVENTORY"),
+      node("h3", "", product.name || "Product")
+    );
+
+    const specs = [];
+    if (product.year) specs.push(`Year: ${product.year}`);
+    if (product.mileage != null && product.mileage !== "") {
+      specs.push(`Mileage: ${money(product.mileage)} km`);
+    }
+    if (product.horsepower != null && product.horsepower !== "") {
+      specs.push(`${product.horsepower} HP`);
+    }
+    if (product.hours != null && product.hours !== "") {
+      specs.push(`${product.hours} engine hours`);
+    }
+    if (specs.length) {
+      details.append(node("p", "product-meta", specs.join(" · ")));
+    }
+
+    details.append(node("p", "product-price", `${money(product.price)} EGP`));
+
+    const sold =
+      String(product.status || "available").toLowerCase() === "sold_out" ||
+      Number(product.quantity) === 0;
+
+    details.append(
+      node("span", `product-status${sold ? " sold-out" : ""}`,
+        sold ? "SOLD OUT" : "AVAILABLE"),
+      node("p", "product-meta",
+        `Quantity: ${Number.isFinite(Number(product.quantity)) ? Number(product.quantity) : 1}`),
+      node("p", "public-product-description",
+        product.description || "Contact us for details and availability.")
+    );
+
+    const view = node("button", "button", "VIEW DETAILS");
+    view.type = "button";
+    view.addEventListener("click", event => {
+      event.stopPropagation();
+      showProductDetails(product);
+    });
+
+    const buy = node("a", "button product-card-buy", sold ? "SOLD OUT" : "BUY NOW ↗");
+    buy.href = sold ? "#" : whatsappUrl(product);
+
+    if (sold) {
+      buy.setAttribute("aria-disabled", "true");
+      buy.addEventListener("click", event => event.preventDefault());
+    } else {
+      buy.target = "_blank";
+      buy.rel = "noopener noreferrer";
+    }
+
+    buy.addEventListener("click", event => event.stopPropagation());
+
+    details.append(view, buy);
+    card.append(details);
+
+    card.addEventListener("click", () => showProductDetails(product));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        showProductDetails(product);
+      }
+    });
+
+    publicList.append(card);
+  });
+}
+
+async function publicInventory() {
+  if (!db) {
+    demoMode = true;
+    renderPublic(demo);
+    msg(publicMsg, "Demo inventory is shown. Configure Supabase to enable live inventory.");
+    return;
+  }
+
+  const { data, error } = await db
+    .from("products")
+    .select("id,name,price,hours,description,images,category,year,mileage,horsepower,status,quantity")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    demoMode = true;
+    renderPublic(demo);
+    msg(publicMsg, "Showing demo inventory because live inventory could not be loaded.");
+  } else {
+    demoMode = false;
+    items = data || [];
+    renderPublic(items);
+    msg(publicMsg, "");
+  }
+}
+
+async function profile(id) {
+  const { data, error } = await db
+    .from("profiles")
+    .select("id,email,role")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (!data || !["owner", "admin"].includes(data.role)) {
+    throw Error("This account has no authorized staff role.");
+  }
+
+  return data;
+}
+
+async function loadProducts() {
+  if (!staff() || !productList) return;
+
+  productList.replaceChildren(node("p", "", "Loading inventory..."));
+
+  const { data, error } = await db
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    productList.replaceChildren(
+      node("p", "", "Unable to load products. Check database permissions.")
+    );
+    return;
+  }
+
+  items = data || [];
+  renderStaff();
+  renderPublic(items);
+}
+
+function renderStaff() {
+  if (!productList) return;
+
+  productList.replaceChildren();
+
+  if (!items.length) {
+    productList.append(node("p", "", "No products in database yet."));
+    return;
+  }
+
+  items.forEach(product => {
+    const card = node("article", "admin-product-item");
+
+    card.append(
+      node("h4", "", product.name),
+      node("p", "", `Price: ${money(product.price)} EGP`),
+      node("p", "", `Hours: ${product.hours ?? "Not specified"}`),
+      node("p", "", `Status: ${product.status || "available"}`),
+      node("p", "", `Quantity: ${product.quantity ?? 1}`),
+      node("p", "", product.description || "No description")
+    );
+
+    const actions = node("div", "admin-product-item-actions");
+    const edit = node("button", "", "Edit");
+    const del = node("button", "", "Delete");
+
+    edit.type = del.type = "button";
+    edit.addEventListener("click", () => editProduct(product));
+    del.addEventListener("click", () => deleteProduct(product.id, product.name));
+
+    actions.append(edit, del);
+    card.append(actions);
+    productList.append(card);
+  });
+}
+
+async function showDashboard(profileData) {
+  user = (await db.auth.getUser()).data.user;
+  role = profileData.role;
+  dashboard.hidden = false;
+  closeLogin();
+
+  $("[data-staff-email]").textContent = profileData.email || user?.email || "";
+  $("[data-staff-role]").textContent = role.toUpperCase();
+
+  $$(".owner-only").forEach(element => {
+    element.hidden = !owner();
+  });
+
+  if (ownerPanel) ownerPanel.hidden = !owner();
+
+  await loadProducts();
+}
+
+function editProduct(product) {
+  editingId = product.id;
+
+  const values = {
+    name: product.name,
+    price: product.price,
+    hours: product.hours,
+    description: product.description,
+    images: productImages(product).join("\n"),
+    category: product.category || "jet_ski",
+    year: product.year ?? "",
+    mileage: product.mileage ?? "",
+    horsepower: product.horsepower ?? "",
+    status: product.status || "available",
+    quantity: product.quantity ?? 1
+  };
+
+  for (const [name, value] of Object.entries(values)) {
+    const field = productForm.elements.namedItem(name);
+    if (field) field.value = value ?? "";
+  }
+
+  saveButton.textContent = "UPDATE PRODUCT";
+  msg($(".admin-message", productForm), "Editing product.");
+  productForm.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function readProduct() {
+  const field = name => productForm.elements.namedItem(name);
+
+  const name = field("name")?.value.trim() || "";
+  const price = field("price")?.value ?? "";
+  const hours = field("hours")?.value ?? "";
+  const description = field("description")?.value.trim() || "";
+  const imageText = field("images")?.value.trim() || "";
+  const status = field("status")?.value || "available";
+  const quantity = field("quantity")?.value ?? "1";
+
+  if (!name) throw Error("Enter a product name.");
+  if (price === "" || !Number.isFinite(+price) || +price < 0) {
+    throw Error("Enter a valid price.");
+  }
+  if (hours !== "" && (!Number.isFinite(+hours) || +hours < 0)) {
+    throw Error("Enter valid engine hours.");
+  }
+  if (quantity === "" || !Number.isInteger(+quantity) || +quantity < 0) {
+    throw Error("Enter a whole number for quantity available.");
+  }
+
+  const images = imageText
+    ? imageText.split(/\n+/).map(value => value.trim()).filter(Boolean)
+    : [];
+
+  images.forEach(src => {
+    let url;
+    try {
+      url = new URL(src);
+    } catch {
+      throw Error("Every image must be a valid URL.");
+    }
+    if (!["http:", "https:"].includes(url.protocol)) {
+      throw Error("Image URLs must use HTTP or HTTPS.");
+    }
+  });
+
+  const optionalNumber = name => {
+    const value = field(name)?.value ?? "";
+    return value === ""
+      ? null
+      : (Number.isFinite(+value) && +value >= 0 ? +value : null);
+  };
+
+  return {
+    name,
+    price: +price,
+    hours: hours === "" ? null : +hours,
+    description,
+    images,
+    category: normalizeCategory(field("category")?.value || "jet_ski"),
+    year: optionalNumber("year"),
+    mileage: optionalNumber("mileage"),
+    horsepower: optionalNumber("horsepower"),
+    status,
+    quantity: +quantity
+  };
+}
+
+/* Image album picker and preview */
+const imagePicker = $("#productImageFiles");
+const imagePreview = $("#imageUploadPreview");
+
+imagePicker?.addEventListener("change", () => {
+  if (!imagePreview) return;
+  imagePreview.replaceChildren();
+
+  [...(imagePicker.files || [])].forEach(file => {
+    const image = node("img");
+    image.alt = file.name;
+    image.src = URL.createObjectURL(file);
+    imagePreview.append(image);
+  });
+});
+
+/* Upload selected photos to Supabase Storage */
+async function uploadSelectedImages() {
+  const files = [...(imagePicker?.files || [])];
+  if (!files.length) return [];
+
+  if (!db?.storage) throw Error("Supabase Storage is unavailable.");
+
+  const uploaded = [];
+
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) {
+      throw Error("Choose image files only.");
+    }
+
+    if (file.size > 12 * 1024 * 1024) {
+      throw Error(`${file.name} is larger than 12 MB.`);
+    }
+
+    const safe = file.name.normalize("NFKD")
+      .replace(/[^a-zA-Z0-9._-]+/g, "-");
+
+    const path = `products/${Date.now()}-${crypto.randomUUID()}-${safe}`;
+
+    const { error } = await db.storage
+      .from("product-images")
+      .upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (error) {
+      throw Error(
+        `Image upload failed (${file.name}): ${error.message}. ` +
+        "Check the Storage INSERT policy for authenticated staff."
+      );
+    }
+
+    const { data } = db.storage.from("product-images").getPublicUrl(path);
+    uploaded.push(data.publicUrl);
+  }
+
+  return uploaded;
+}
+
+/* Save or update a product */
+productForm?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!staff() || busy) return;
+
+  busy = true;
+  toggleBusy(saveButton, true, "SAVING...");
+
+  const statusMessage = $(".admin-message", productForm);
+  msg(statusMessage, "");
+
+  try {
+    const product = readProduct();
+    const uploaded = await uploadSelectedImages();
+
+    if (uploaded.length) {
+      product.images = [...product.images, ...uploaded];
+    }
+
+    const result = editingId
+      ? await db.from("products").update(product).eq("id", editingId).select().single()
+      : await db.from("products").insert(product).select().single();
+
+    if (result.error) throw result.error;
+
+    editingId = null;
+    productForm.reset();
+
+    if (imagePreview) imagePreview.replaceChildren();
+    if (imagePicker) imagePicker.value = "";
+
+    saveButton.textContent = "SAVE PRODUCT";
+    msg(statusMessage, "Product saved successfully.", "success");
+
+    await loadProducts();
+  } catch (error) {
+    console.error(error);
+    msg(statusMessage, error.message || "Could not save product.", "error");
+  } finally {
+    busy = false;
+    toggleBusy(saveButton, false);
+  }
+});
+
+async function deleteProduct(id, name) {
+  if (!staff() || busy ||
+      !confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+  busy = true;
+
+  try {
+    const { error } = await db.from("products").delete().eq("id", id);
+    if (error) throw error;
+    await loadProducts();
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "Could not delete product.");
+  } finally {
+    busy = false;
+  }
+}
+
+$$("[data-cancel-product]").forEach(button => {
+  button.addEventListener("click", () => {
+    editingId = null;
+    productForm.reset();
+
+    if (imagePreview) imagePreview.replaceChildren();
+    if (imagePicker) imagePicker.value = "";
+
+    saveButton.textContent = "SAVE PRODUCT";
+    msg($(".admin-message", productForm), "");
+  });
+});
+
+/* Staff login */
+loginForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (!db) {
+    msg($(".admin-message", loginForm),
+      "Configure Supabase URL and key in script.js first.", "error");
+    return;
+  }
+
+  if (busy) return;
+
+  busy = true;
+  toggleBusy($("#staffLoginSubmit"), true, "SIGNING IN...");
+
+  try {
+    const { data, error } = await db.auth.signInWithPassword({
+      email: loginForm.elements.email.value.trim(),
+      password: loginForm.elements.password.value
+    });
+
+    if (error) throw error;
+
+    const profileData = await profile(data.user.id);
+    await showDashboard(profileData);
+  } catch (error) {
+    console.error(error);
+    await db.auth.signOut();
+    msg($(".admin-message", loginForm), error.message || "Sign-in failed.", "error");
+  } finally {
+    busy = false;
+    toggleBusy($("#staffLoginSubmit"), false);
+  }
+});
+
+async function logout() {
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    alert("Could not sign out.");
+    return;
+  }
+
+  user = null;
+  role = null;
+  items = [];
+  dashboard.hidden = true;
+  productForm.reset();
+  openLogin();
+}
+
+$$("[data-staff-logout]").forEach(button =>
+  button.addEventListener("click", logout)
+);
+
+/* Owner creates admin using the secured Supabase Edge Function */
+createAdminForm?.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const statusMessage = $(".admin-message", createAdminForm);
+
+  if (!owner()) {
+    msg(statusMessage, "Only the Owner can create Admin accounts.", "error");
+    return;
+  }
+
+  if (busy) return;
+
+  const email = createAdminForm.elements.email.value.trim();
+  const password = createAdminForm.elements.password.value;
+
+  if (password.length < 12) {
+    msg(statusMessage, "Use a password with at least 12 characters.", "error");
+    return;
+  }
+
+  busy = true;
+  const button = $('button[type="submit"]', createAdminForm);
+  toggleBusy(button, true, "CREATING...");
+
+  try {
+    const { data, error } = await db.functions.invoke("create-admin", {
+      body: { email, password }
+    });
+
+    if (error) throw error;
+    if (data?.error) throw Error(data.error);
+
+    createAdminForm.reset();
+    msg(statusMessage, "Admin account created successfully.", "success");
+  } catch (error) {
+    console.error(error);
+    msg(statusMessage,
+      error.message || "Could not create Admin. Check Edge Function setup.",
+      "error");
+  } finally {
+    busy = false;
+    toggleBusy(button, false);
+  }
+});
+
+/* Animated showroom intro */
+function initShowroomIntro() {
+  const intro = $("#introScreen");
+  const enterButton = $("#enterShowroom");
+
+  if (!intro || !enterButton) return;
+
+  const enter = () => {
+    intro.classList.add("intro-exit");
+    intro.setAttribute("aria-hidden", "true");
+    document.body.classList.add("showroom-entered");
+
+    window.setTimeout(() => {
+      intro.hidden = true;
+    }, 800);
+  };
+
+  enterButton.addEventListener("click", event => {
+    event.preventDefault();
+    enter();
+  });
+}
+
+initShowroomIntro();
+
+/* Start Supabase */
+async function init() {
+  dashboard.hidden = true;
+  if (ownerPanel) ownerPanel.hidden = true;
+
+  if (!window.supabase) {
+    demoMode = true;
+    renderPublic(demo);
+    msg(publicMsg, "Supabase library could not load.");
+    return;
+  }
+
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  });
+
+  await publicInventory();
+
+  const { data: { session } } = await db.auth.getSession();
+
+  if (session?.user) {
+    try {
+      await showDashboard(await profile(session.user.id));
+    } catch (error) {
+      console.error(error);
+      await db.auth.signOut();
+    }
+  }
+
+  db.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT") {
+      user = null;
+      role = null;
+      dashboard.hidden = true;
+    } else if (event === "SIGNED_IN" && session?.user) {
+      setTimeout(async () => {
+        try {
+          await showDashboard(await profile(session.user.id));
+        } catch (error) {
+          console.error(error);
+          await db.auth.signOut();
+        }
+      }, 0);
+    }
+  });
+}
+
+init().catch(error => {
+  console.error(error);
+  demoMode = true;
+  renderPublic(demo);
+  msg(publicMsg, "Site is in demo mode. Check Supabase setup.");
+});
+
+})();
