@@ -219,7 +219,6 @@
       const card = node("article", "public-product-card");
       const images = Array.isArray(product.images) ? product.images : [];
       const imageSource = validImage(images[0]);
-
       const category = product.category || "jet_ski";
 
       if (imageSource) {
@@ -270,7 +269,6 @@
         )
       );
 
-      // Vehicle and product specifications
       const specs = node("div", "product-specifications");
 
       if (product.year != null && product.year !== "") {
@@ -351,32 +349,48 @@
     });
   }
 
+  // Category filtering
   function setCategory(category) {
+    const allowedCategories = ["all", ...Object.keys(categories)];
+
+    if (!allowedCategories.includes(category)) {
+      category = "all";
+    }
+
     selectedCategory = category;
 
-    $$(".category-button", categoryFilter || document).forEach(button => {
-      const active = button.dataset.category === category;
+    $$(".category-button, #categoryFilter [data-category]").forEach(button => {
+      const buttonCategory = button.dataset.category || "all";
+      const active = buttonCategory === selectedCategory;
 
       button.classList.toggle("active", active);
-
-      if (active) {
-        button.setAttribute("aria-pressed", "true");
-      } else {
-        button.setAttribute("aria-pressed", "false");
-      }
+      button.setAttribute("aria-pressed", String(active));
     });
 
     renderPublic(demoMode ? demo : items);
   }
 
-  $$(".category-button", categoryFilter || document).forEach(button => {
-    button.addEventListener("click", () => {
-      setCategory(button.dataset.category || "all");
-    });
+  // Use delegated clicks so category buttons continue working if the
+  // buttons are changed or rebuilt after this script loads.
+  document.addEventListener("click", event => {
+    const target = event.target;
+
+    if (!(target instanceof Element)) return;
+
+    const button = target.closest(
+      "#categoryFilter [data-category], .category-button[data-category]"
+    );
+
+    if (!button) return;
+
+    event.preventDefault();
+
+    setCategory(button.dataset.category || "all");
   });
 
   async function publicInventory() {
     if (!db) {
+      demoMode = true;
       renderPublic(demo);
       msg(publicMsg, "Showing demonstration products.");
       return;
@@ -407,6 +421,7 @@
 
     renderPublic(items);
     msg(publicMsg, "");
+    setCategory(selectedCategory);
   }
 
   async function getProfile(userId) {
@@ -455,6 +470,7 @@
 
     renderStaff();
     renderPublic(items);
+    setCategory(selectedCategory);
   }
 
   function renderStaff() {
@@ -623,7 +639,6 @@
       }
     }
 
-    // Never assign a value to a file input.
     if (imageInput) imageInput.value = "";
 
     showExistingImages(editingImages);
@@ -634,7 +649,7 @@
 
     msg(
       $(".admin-message", productForm),
-      "Editing product. Existing images will be kept unless you remove or replace them."
+      "Editing product. Existing images will be kept unless you upload replacements."
     );
 
     productForm.scrollIntoView({
@@ -729,7 +744,7 @@
       throw new Error("Enter a valid price.");
     }
 
-    if (!Object.hasOwn(categories, category)) {
+    if (!Object.prototype.hasOwnProperty.call(categories, category)) {
       throw new Error("Choose a valid product category.");
     }
 
@@ -1013,6 +1028,7 @@
     ) {
       demoMode = true;
       renderPublic(demo);
+      setCategory("all");
 
       msg(
         publicMsg,
@@ -1081,6 +1097,7 @@
     if (!items.length) {
       demoMode = true;
       renderPublic(demo);
+      setCategory("all");
     }
 
     msg(
