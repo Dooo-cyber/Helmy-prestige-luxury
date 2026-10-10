@@ -228,9 +228,11 @@ buyNow.rel = "noopener noreferrer";
 
 details.append(buyNow);
 
-card.append(details);
-publicList.append(card);
 
+      card.append(details);
+      publicList.append(card);
+    });
+  }
 
   async function publicInventory() {
   if (!db) {
