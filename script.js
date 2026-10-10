@@ -7,7 +7,8 @@
 
   
 const SUPABASE_URL = "https://fnftfpthzlgkfexnknaw.supabase.co";
-const SUPABASE_KEY="sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
+const SUPABASE_KEY = "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
+
 
   
 
