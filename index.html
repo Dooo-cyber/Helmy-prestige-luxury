@@ -1,763 +1,221 @@
-
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#08090b">
-  <meta name="description" content="Helmy Prestige Luxury — luxury cars, beach buggies, jet skis and boats.">
-  <title>HELMY PRESTIGE LUXURY</title>
-  <link rel="stylesheet" href="style.css?v=20261011">
-
-  <style>
-    [hidden] { display: none !important; }
-
-    /* Product details */
-    .hp-details-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
-      overflow-y: auto;
-      background: rgba(0,0,0,.9);
-      backdrop-filter: blur(12px);
-    }
-
-    .hp-details-box {
-      width: min(100%, 1050px);
-      max-height: 95vh;
-      overflow-y: auto;
-      padding: 24px;
-      color: #f4f4f4;
-      background: #101114;
-      border: 1px solid #777;
-      border-radius: 14px;
-      box-shadow: 0 25px 90px #000;
-    }
-
-    .hp-details-close {
-      position: sticky;
-      top: 0;
-      float: right;
-      z-index: 5;
-      width: 42px;
-      height: 42px;
-      border: 1px solid #777;
-      border-radius: 50%;
-      background: #18191c;
-      color: #fff;
-      font-size: 27px;
-      cursor: pointer;
-    }
-
-    .hp-details-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
-      gap: 28px;
-      clear: both;
-    }
-
-    .hp-details-photo-wrap {
-      position: relative;
-      background: #08090b;
-      border: 1px solid #303136;
-      border-radius: 9px;
-      overflow: hidden;
-    }
-
-    #hpDetailsPhoto {
-      display: block;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      object-fit: contain;
-      background: #08090b;
-    }
-
-    .hp-photo-arrow {
-      position: absolute;
-      top: 45%;
-      width: 42px;
-      height: 42px;
-      color: white;
-      background: rgba(0,0,0,.8);
-      border: 1px solid #777;
-      border-radius: 50%;
-      font-size: 25px;
-      cursor: pointer;
-    }
-
-    #hpPhotoPrev { left: 10px; }
-    #hpPhotoNext { right: 10px; }
-
-    #hpPhotoCounter {
-      margin: 12px 0;
-      color: #c5c5c5;
-      text-align: center;
-      font-size: 11px;
-      letter-spacing: 2px;
-    }
-
-    #hpDetailsThumbs {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 4px 0 12px;
-    }
-
-    #hpDetailsThumbs img {
-      flex: 0 0 72px;
-      width: 72px;
-      height: 58px;
-      object-fit: cover;
-      border: 1px solid #555;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #hpDetailsThumbs img.active {
-      border: 2px solid #e0c78a;
-    }
-
-    .hp-gold {
-      color: #e0c78a;
-      letter-spacing: 2px;
-      font-size: 11px;
-    }
-
-    #hpDetailsTitle {
-      font-size: clamp(26px, 4vw, 42px);
-      line-height: 1.15;
-      overflow-wrap: anywhere;
-    }
-
-    #hpDetailsPrice {
-      color: #e0c78a;
-      font-size: 25px;
-      font-weight: 700;
-    }
-
-    #hpDetailsDescription {
-      color: #c3c3c8;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    #hpDetailsSpecs {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 9px;
-      margin: 20px 0;
-    }
-
-    .hp-spec {
-      padding: 12px;
-      background: #17181b;
-      border: 1px solid #34353a;
-      border-radius: 6px;
-      overflow-wrap: anywhere;
-    }
-
-    .hp-spec small {
-      display: block;
-      margin-bottom: 6px;
-      color: #aaa;
-      font-size: 10px;
-      letter-spacing: 1px;
-    }
-
-    .hp-details-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .hp-details-actions a,
-    .hp-details-actions button {
-      min-height: 46px;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12px 15px;
-      border-radius: 5px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    #hpBuyProduct {
-      flex: 1;
-      color: #101114;
-      background: #e0c78a;
-      border: 1px solid #e0c78a;
-    }
-
-    #hpRotateProduct {
-      color: white;
-      background: transparent;
-      border: 1px solid #777;
-    }
-
-    #hpRotateNote {
-      color: #999;
-      font-size: 11px;
-      line-height: 1.7;
-    }
-
-    @media (max-width: 680px) {
-      .hp-details-box { padding: 15px; }
-      .hp-details-grid { grid-template-columns: 1fr; gap: 18px; }
-      #hpDetailsTitle { font-size: 28px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080b0f">
+<title>Helmy Prestige | Premium Watercraft</title>
+<link rel="stylesheet" href="style.css?v=20261010">
 </head>
-
 <body>
+<div id="introScreen" class="intro-screen">
+  <div class="intro-mark">HP</div>
+  <p class="eyebrow">WELCOME TO</p>
+  <h1>HELMY <em>PRESTIGE</em></h1>
+  <p class="intro-subtitle">THE ART OF PREMIUM RIDES</p>
+  <button id="enterShowroom" class="button">ENTER SHOWROOM</button>
+</div>
 
-  <!-- WELCOME SCREEN -->
-  <section class="intro-screen" id="introScreen">
-    <div class="intro-content">
-      <div class="intro-monogram">HP</div>
-      <p class="eyebrow">EXCLUSIVE LUXURY COLLECTION</p>
-      <h1 class="intro-title">HELMY PRESTIGE LUXURY</h1>
-      <p class="intro-subtitle">AUTOMOTIVE · MARINE · ADVENTURE</p>
-      <button class="enter-showroom" id="enterShowroom" type="button">
-        ENTER SHOWROOM →
-      </button>
+<header class="site-header">
+  <a class="brand" href="#home">
+    <span class="brand-mark">HP</span>
+    <span><strong>HELMY PRESTIGE</strong><small>PREMIUM WATERCRAFT</small></span>
+  </a>
+  <nav>
+    <a href="#inventory">Inventory</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <button class="staff-login-trigger" type="button">STAFF LOGIN</button>
+</header>
+
+<main id="home">
+  <section class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">THE ART OF WATER</p>
+      <h1>Ride Beyond<br><em>Ordinary.</em></h1>
+      <p class="hero-copy">A curated collection of premium Sea-Doo personal watercraft.</p>
+      <a class="button" href="#inventory">EXPLORE COLLECTION</a>
     </div>
+    <p class="hero-caption">HELMY PRESTIGE — EST. FOR THE EXTRAORDINARY</p>
   </section>
 
-  <!-- HEADER -->
-  <header class="site-header" id="siteHeader">
-    <a class="brand" href="#home">
-      <span class="brand-mark">HP</span>
-      <span>
-        <strong>HELMY PRESTIGE</strong>
-        <small>LUXURY COLLECTION</small>
-      </span>
-    </a>
+  <section class="section" id="inventory">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">THE COLLECTION</p>
+        <h2>Featured <em>Inventory</em></h2>
+      </div>
+      <p>Selected machines. Exceptional experiences.</p>
+    </div>
 
-    <nav aria-label="Main navigation">
-      <a href="#inventory">Collection</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </nav>
+    <div class="category-filters" aria-label="Filter products">
+      <button type="button" class="active" data-category="all">All</button>
+      <button type="button" data-category="car">Cars</button>
+      <button type="button" data-category="beach_buggy">Beach Buggies</button>
+      <button type="button" data-category="jet_ski">Jet Skis</button>
+      <button type="button" data-category="boat">Boats</button>
+    </div>
 
-    <button class="staff-login-trigger" type="button">STAFF LOGIN</button>
+    <div id="publicProductList" class="public-product-list" aria-live="polite"></div>
+    <p id="publicInventoryMessage" class="notice" role="status"></p>
+  </section>
+
+  <section class="about-section" id="about">
+    <div>
+      <p class="eyebrow">THE HELMY STANDARD</p>
+      <h2>Performance.<br><em>Without Compromise.</em></h2>
+    </div>
+    <p>Helmy Prestige brings together carefully selected personal watercraft for riders who value performance, condition and distinction. Contact our team for availability and viewing details.</p>
+  </section>
+
+  <section class="contact-section" id="contact">
+    <p class="eyebrow">MAKE YOUR NEXT MOVE</p>
+    <h2>Find Your <em>Ride.</em></h2>
+    <div class="contact-grid">
+      <article class="contact-card">
+        <img class="contact-person-image" src="IMG_3354.jpeg" alt="Mohamed Helmy - Owner" loading="lazy">
+        <p class="eyebrow">OWNER</p>
+        <h3>Mohamed Helmy</h3>
+        <p>For ownership and business inquiries.</p>
+        <a href="https://wa.me/201115000225" target="_blank" rel="noopener">WhatsApp: +20 111 500 0225</a>
+        <a href="tel:+201115000225">Call Owner</a>
+      </article>
+
+      <article class="contact-card">
+        <img class="contact-person-image" src="IMG_1363.jpg" alt="Omar Helmy - Manager" loading="lazy">
+        <p class="eyebrow">MANAGER</p>
+        <h3>Omar Helmy</h3>
+        <p>For inventory and sales inquiries.</p>
+        <a href="https://wa.me/201117000625" target="_blank" rel="noopener">WhatsApp: +20 111 700 0625</a>
+        <a href="tel:+201117000625">Call Manager</a>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <a class="brand" href="#home">
+    <span class="brand-mark">HP</span>
+    <span><strong>HELMY PRESTIGE</strong><small>PREMIUM WATERCRAFT</small></span>
+  </a>
+  <p>© <span id="currentYear"></span> Helmy Prestige. All rights reserved.</p>
+  <p>Website by Adam Helmy</p>
+</footer>
+
+<div class="admin-modal" hidden>
+  <div class="admin-modal-backdrop"></div>
+  <section class="admin-modal-card" role="dialog" aria-modal="true" aria-labelledby="staffLoginTitle">
+    <button class="admin-close" type="button" aria-label="Close login">&times;</button>
+    <p class="eyebrow">RESTRICTED ACCESS</p>
+    <h2 id="staffLoginTitle">Staff <em>Login</em></h2>
+    <p>Sign in with your authorized staff account.</p>
+    <form id="staffLoginForm">
+      <label for="staffEmail">EMAIL</label>
+      <input id="staffEmail" name="email" type="email" autocomplete="username" required placeholder="you@example.com">
+      <label for="staffPassword">PASSWORD</label>
+      <input id="staffPassword" name="password" type="password" autocomplete="current-password" required placeholder="Your password">
+      <button id="staffLoginSubmit" class="button" type="submit">SIGN IN</button>
+      <p class="admin-message" aria-live="polite"></p>
+    </form>
+    <p class="admin-security-note">Access is limited to approved staff accounts. Permissions are checked against the secured database.</p>
+  </section>
+</div>
+
+<section class="admin-dashboard" hidden aria-label="Staff dashboard">
+  <header class="admin-dashboard-header">
+    <div>
+      <p class="eyebrow">HELMY PRESTIGE / CONTROL PANEL</p>
+      <h2>Staff <em>Dashboard</em></h2>
+      <p>Signed in as <strong data-staff-email></strong> · <span class="staff-role-badge" data-staff-role></span></p>
+    </div>
+    <button class="admin-secondary-button" type="button" data-staff-logout>LOG OUT</button>
   </header>
 
-  <main id="home">
+  <div class="admin-dashboard-content">
+    <section class="admin-panel">
+      <p class="eyebrow">INVENTORY MANAGEMENT</p>
+      <h3>Manage Products</h3>
+      <p>Changes are saved in Supabase. Use public HTTPS image URLs.</p>
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-content">
-        <p class="eyebrow">A NEW LEVEL OF PRESTIGE</p>
-        <h1>Beyond<br><em>Ordinary.</em></h1>
-        <p class="hero-copy">
-          Discover a curated collection of luxury automobiles,
-          beach buggies and premium marine experiences.
-        </p>
-        <a class="button" href="#inventory">EXPLORE THE COLLECTION</a>
-      </div>
-      <p class="hero-caption">HELMY PRESTIGE LUXURY — MADE TO STAND APART</p>
-    </section>
+      <form id="adminProductForm">
+        <label for="productName">PRODUCT NAME</label>
+        <input id="productName" name="name" maxlength="120" required>
 
-    <!-- INVENTORY -->
-    <section class="section" id="inventory">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">THE COLLECTION</p>
-          <h2>Discover <em>Your Next Ride.</em></h2>
+        <label for="productPrice">PRICE (EGP)</label>
+        <input id="productPrice" name="price" type="number" min="0" step="1" required>
+
+        <label for="productHours">ENGINE HOURS</label>
+        <input id="productHours" name="hours" type="number" min="0" step="1">
+
+        <label for="productCategory">CATEGORY</label>
+        <select id="productCategory" name="category">
+          <option value="jet_ski">Jet Ski</option>
+          <option value="car">Car</option>
+          <option value="beach_buggy">Beach Buggy</option>
+          <option value="boat">Boat</option>
+        </select>
+
+        <label for="productYear">YEAR</label>
+        <input id="productYear" name="year" type="number" min="1900" max="2100">
+
+        <label for="productMileage">MILEAGE (KM)</label>
+        <input id="productMileage" name="mileage" type="number" min="0">
+
+        <label for="productHorsepower">HORSEPOWER</label>
+        <input id="productHorsepower" name="horsepower" type="number" min="0">
+
+        <label for="productDescription">DESCRIPTION</label>
+        <textarea id="productDescription" name="description" rows="3"></textarea>
+
+        <label for="productImages">IMAGE URLS (one per line)</label>
+        <textarea id="productImages" name="images" rows="3" placeholder="https://example.com/image.jpg"></textarea>
+
+        <div class="admin-form-actions">
+          <button id="adminSaveProduct" class="button" type="submit">SAVE PRODUCT</button>
+          <button class="admin-secondary-button" type="button" data-cancel-product>CANCEL EDIT</button>
         </div>
-        <p>Four worlds. One standard of luxury.</p>
-      </div>
-
-      <div class="category-filter" id="categoryFilter" aria-label="Filter collection">
-        <button type="button" class="category-button active" data-category="all">ALL</button>
-        <button type="button" class="category-button" data-category="car">CARS</button>
-        <button type="button" class="category-button" data-category="beach_buggy">BEACH BUGGIES</button>
-        <button type="button" class="category-button" data-category="jet_ski">JET SKIS</button>
-        <button type="button" class="category-button" data-category="boat">BOATS</button>
-      </div>
-
-      <div id="publicProductList" class="public-product-list" aria-live="polite"></div>
-      <p id="publicInventoryMessage" class="notice" role="status"></p>
-    </section>
-
-    <!-- ABOUT -->
-    <section class="about-section" id="about">
-      <div>
-        <p class="eyebrow">THE HELMY STANDARD</p>
-        <h2>Performance.<br><em>Without Compromise.</em></h2>
-      </div>
-      <p>
-        Helmy Prestige Luxury brings together carefully selected
-        automobiles and marine machines for people who value performance,
-        quality and distinction. Contact our team for availability,
-        specifications and viewing details.
-      </p>
-    </section>
-
-    <!-- CONTACT -->
-    <section class="contact-section" id="contact">
-      <p class="eyebrow">PERSONAL SERVICE. EXCEPTIONAL MACHINES.</p>
-      <h2>Make Your <em>Next Move.</em></h2>
-
-      <div class="contact-grid">
-        <article class="contact-card">
-          <img class="contact-person-image"
-               src="IMG_3354.jpeg"
-               alt="Mohamed Helmy — Owner" loading="lazy">
-          <p class="eyebrow">OWNER</p>
-          <h3>Mohamed Helmy</h3>
-          <p>For ownership and business inquiries.</p>
-          <a href="https://wa.me/201115000225" target="_blank" rel="noopener noreferrer">
-            WhatsApp: +20 111 500 0225
-          </a>
-          <a href="tel:+201115000225">Call Owner</a>
-        </article>
-
-        <article class="contact-card">
-          <img class="contact-person-image"
-               src="IMG_1363.jpg"
-               alt="Omar Helmy — Manager" loading="lazy">
-          <p class="eyebrow">MANAGER</p>
-          <h3>Omar Helmy</h3>
-          <p>For inventory and sales inquiries.</p>
-          <a href="https://wa.me/201117000625" target="_blank" rel="noopener noreferrer">
-            WhatsApp: +20 111 700 0625
-          </a>
-          <a href="tel:+201117000625">Call Manager</a>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <a class="brand" href="#home">
-      <span class="brand-mark">HP</span>
-      <span>
-        <strong>HELMY PRESTIGE</strong>
-        <small>LUXURY COLLECTION</small>
-      </span>
-    </a>
-    <p>© <span id="currentYear"></span> Helmy Prestige Luxury. All rights reserved.</p>
-    <p>Website by Adam Helmy</p>
-  </footer>
-
-  <!-- PRODUCT DETAILS MODAL -->
-  <div class="hp-details-overlay" id="hpDetailsOverlay" hidden>
-    <section class="hp-details-box" role="dialog"
-             aria-modal="true" aria-labelledby="hpDetailsTitle">
-      <button type="button" class="hp-details-close"
-              id="hpDetailsClose" aria-label="Close details">&times;</button>
-
-      <div class="hp-details-grid">
-        <div>
-          <div class="hp-details-photo-wrap">
-            <img id="hpDetailsPhoto" alt="Product photo">
-            <button type="button" class="hp-photo-arrow"
-                    id="hpPhotoPrev" aria-label="Previous photo">‹</button>
-            <button type="button" class="hp-photo-arrow"
-                    id="hpPhotoNext" aria-label="Next photo">›</button>
-          </div>
-          <p id="hpPhotoCounter">IMAGE 1 / 1</p>
-          <div id="hpDetailsThumbs"></div>
-        </div>
-
-        <div>
-          <p class="hp-gold">HELMY PRESTIGE LUXURY</p>
-          <h2 id="hpDetailsTitle">Product details</h2>
-          <p id="hpDetailsPrice"></p>
-          <p id="hpDetailsDescription"></p>
-          <div id="hpDetailsSpecs"></div>
-
-          <div class="hp-details-actions">
-            <a id="hpBuyProduct" href="https://wa.me/201115000225"
-               target="_blank" rel="noopener noreferrer">
-              BUY NOW VIA WHATSAPP
-            </a>
-            <button id="hpRotateProduct" type="button">360° VIEW</button>
-          </div>
-          <p id="hpRotateNote">
-            Use the arrows to view available photos. A full 360-degree view
-            requires photos of the product taken from multiple angles.
-          </p>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- STAFF LOGIN MODAL -->
-  <div class="admin-modal" hidden>
-    <div class="admin-modal-backdrop"></div>
-    <section class="admin-modal-card" role="dialog" aria-modal="true"
-             aria-labelledby="staffLoginTitle">
-      <button class="admin-close" type="button" aria-label="Close login">&times;</button>
-      <p class="eyebrow">RESTRICTED ACCESS</p>
-      <h2 id="staffLoginTitle">Staff <em>Login</em></h2>
-      <p>Sign in with your authorized staff account.</p>
-
-      <form id="staffLoginForm">
-        <label for="staffEmail">EMAIL</label>
-        <input id="staffEmail" name="email" type="email"
-               autocomplete="username" required placeholder="you@example.com">
-
-        <label for="staffPassword">PASSWORD</label>
-        <input id="staffPassword" name="password" type="password"
-               autocomplete="current-password" required placeholder="Your password">
-
-        <button id="staffLoginSubmit" class="button" type="submit">SIGN IN</button>
         <p class="admin-message" aria-live="polite"></p>
       </form>
+    </section>
 
-      <p class="admin-security-note">
-        Access is limited to approved staff accounts. Permissions are checked against the secured database.
-      </p>
+    <section class="admin-panel">
+      <p class="eyebrow">CURRENT LISTINGS</p>
+      <h3>Inventory</h3>
+      <div class="admin-product-list" aria-live="polite"><p>Sign in to load inventory.</p></div>
+    </section>
+
+    <section id="ownerManagementPanel" class="admin-panel owner-only" hidden>
+      <p class="eyebrow">OWNER PRIVILEGES</p>
+      <h3>Create Admin Account</h3>
+      <p>Only the Owner can create Admin accounts. The server-side function checks the role.</p>
+      <form id="ownerCreateAdminForm">
+        <label for="newAdminEmail">NEW ADMIN EMAIL</label>
+        <input id="newAdminEmail" name="email" type="email" required>
+
+        <label for="newAdminPassword">TEMPORARY PASSWORD (12+ CHARACTERS)</label>
+        <input id="newAdminPassword" name="password" type="password" minlength="12" required>
+
+        <div class="admin-form-actions">
+          <button class="button" type="submit">CREATE ADMIN</button>
+        </div>
+        <p class="admin-message" aria-live="polite"></p>
+      </form>
+      <p class="admin-permission-note"><strong>Security:</strong> Never share your Owner login. Admin creation is enforced server-side.</p>
     </section>
   </div>
+</section>
 
-  <!-- STAFF DASHBOARD -->
-  <section class="admin-dashboard" hidden aria-label="Staff dashboard">
-    <header class="admin-dashboard-header">
-      <div>
-        <p class="eyebrow">HELMY PRESTIGE / CONTROL PANEL</p>
-        <h2>Staff <em>Dashboard</em></h2>
-        <p>
-          Signed in as <strong data-staff-email></strong> ·
-          <span class="staff-role-badge" data-staff-role></span>
-        </p>
-      </div>
-      <button class="admin-secondary-button" type="button" data-staff-logout>LOG OUT</button>
-    </header>
-
-    <div class="admin-dashboard-content">
-      <section class="admin-panel">
-        <p class="eyebrow">INVENTORY MANAGEMENT</p>
-        <h3>Manage Products</h3>
-        <p>Changes are saved in Supabase. Choose product photos from your album.</p>
-
-        <form id="adminProductForm">
-          <label for="productName">PRODUCT NAME</label>
-          <input id="productName" name="name" maxlength="120" required>
-
-          <label for="productCategory">CATEGORY</label>
-          <select id="productCategory" name="category" required>
-            <option value="jet_ski">Jet Ski</option>
-            <option value="boat">Boat</option>
-            <option value="car">Car</option>
-            <option value="beach_buggy">Beach Buggy</option>
-          </select>
-
-          <label for="productPrice">PRICE (EGP)</label>
-          <input id="productPrice" name="price" type="number" min="0" step="1" required>
-
-          <label for="productYear">YEAR</label>
-          <input id="productYear" name="year" type="number" min="1900" max="2100" step="1">
-
-          <label for="productMileage">MILEAGE / KM</label>
-          <input id="productMileage" name="mileage" type="number" min="0" step="1">
-
-          <label for="productHorsepower">HORSEPOWER (HP)</label>
-          <input id="productHorsepower" name="horsepower" type="number" min="0" step="1">
-
-          <label for="productHours">ENGINE HOURS (WATERCRAFT)</label>
-          <input id="productHours" name="hours" type="number" min="0" step="1">
-
-          <label for="productDescription">DESCRIPTION</label>
-          <textarea id="productDescription" name="description" rows="3"></textarea>
-
-          <label for="productImages">PRODUCT IMAGES</label>
-          <input type="file" id="productImages" name="images" accept="image/*" multiple>
-          <div id="productImagePreview"></div>
-
-          <label for="productStatus">PRODUCT STATUS</label>
-          <select id="productStatus" name="status">
-            <option value="available">Available</option>
-            <option value="sold_out">Sold Out</option>
-          </select>
-
-          <div class="admin-form-actions">
-            <button id="adminSaveProduct" class="button" type="submit">SAVE PRODUCT</button>
-            <button class="admin-secondary-button" type="button" data-cancel-product>CANCEL EDIT</button>
-          </div>
-          <p class="admin-message" aria-live="polite"></p>
-        </form>
-      </section>
-
-      <section class="admin-panel">
-        <p class="eyebrow">CURRENT LISTINGS</p>
-        <h3>Inventory</h3>
-        <div class="admin-product-list" aria-live="polite">
-          <p>Sign in to load inventory.</p>
-        </div>
-      </section>
-
-      <section id="ownerManagementPanel" class="admin-panel owner-only" hidden>
-        <p class="eyebrow">OWNER PRIVILEGES</p>
-        <h3>Create Admin Account</h3>
-        <p>Only the Owner can create Admin accounts. The server-side function checks the role.</p>
-
-        <form id="ownerCreateAdminForm">
-          <label for="newAdminEmail">NEW ADMIN EMAIL</label>
-          <input id="newAdminEmail" name="email" type="email" required>
-
-          <label for="newAdminPassword">TEMPORARY PASSWORD (12+ CHARACTERS)</label>
-          <input id="newAdminPassword" name="password" type="password" minlength="12" required>
-
-          <div class="admin-form-actions">
-            <button class="button" type="submit">CREATE ADMIN</button>
-          </div>
-          <p class="admin-message" aria-live="polite"></p>
-        </form>
-
-        <p class="admin-permission-note">
-          <strong>Security:</strong> Never share your Owner login. Admin creation is enforced server-side.
-        </p>
-      </section>
-    </div>
+<div id="productDetailsModal" class="details-modal" hidden>
+  <div class="details-backdrop" data-close-details></div>
+  <section class="details-content" role="dialog" aria-modal="true" aria-label="Product details">
+    <button type="button" class="close-details" data-close-details aria-label="Close">&times;</button>
+    <div id="detailsGallery" class="details-gallery"></div>
+    <div id="detailsInfo" class="details-info"></div>
   </section>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=3"></script>
-
-  <!-- Welcome screen -->
-  <script>
-    (() => {
-      const intro = document.getElementById('introScreen');
-      const enterButton = document.getElementById('enterShowroom');
-
-      if (intro && enterButton) {
-        enterButton.addEventListener('click', () => {
-          intro.classList.add('is-leaving');
-          window.setTimeout(() => { intro.hidden = true; }, 850);
-        });
-      }
-    })();
-  </script>
-
-  <!-- Product detail viewer -->
-  <script>
-    (() => {
-      const list = document.getElementById('publicProductList');
-      const overlay = document.getElementById('hpDetailsOverlay');
-      if (!list || !overlay) return;
-
-      const $ = id => document.getElementById(id);
-      let images = [];
-      let index = 0;
-      let rotation = null;
-      let lastFocus = null;
-
-      function stopRotation() {
-        if (rotation) clearInterval(rotation);
-        rotation = null;
-        $('hpRotateProduct').textContent = '360° VIEW';
-      }
-
-      function addSpec(label, value, suffix = '') {
-        if (value === null || value === undefined || value === '') return;
-
-        const box = document.createElement('div');
-        box.className = 'hp-spec';
-
-        const labelEl = document.createElement('small');
-        labelEl.textContent = label;
-
-        const valueEl = document.createElement('strong');
-        valueEl.textContent = String(value) + suffix;
-
-        box.append(labelEl, valueEl);
-        $('hpDetailsSpecs').appendChild(box);
-      }
-
-      function showImage() {
-        const photo = $('hpDetailsPhoto');
-        const thumbs = $('hpDetailsThumbs');
-        thumbs.replaceChildren();
-
-        if (!images.length) {
-          photo.removeAttribute('src');
-          photo.alt = 'No product image available';
-          $('hpPhotoCounter').textContent = 'NO PHOTOS AVAILABLE';
-          $('hpPhotoPrev').hidden = true;
-          $('hpPhotoNext').hidden = true;
-          $('hpRotateProduct').disabled = true;
-          $('hpRotateNote').textContent =
-            'No photos are available for this product yet.';
-          return;
-        }
-
-        photo.src = images[index];
-        photo.alt = $('hpDetailsTitle').textContent + ' photo ' + (index + 1);
-        $('hpPhotoCounter').textContent =
-          'IMAGE ' + (index + 1) + ' / ' + images.length;
-
-        $('hpPhotoPrev').hidden = images.length < 2;
-        $('hpPhotoNext').hidden = images.length < 2;
-        $('hpRotateProduct').disabled = images.length < 2;
-
-        images.forEach((src, i) => {
-          const img = document.createElement('img');
-          img.src = src;
-          img.alt = 'Photo ' + (i + 1);
-          img.loading = 'lazy';
-          img.classList.toggle('active', i === index);
-          img.addEventListener('click', () => {
-            stopRotation();
-            index = i;
-            showImage();
-          });
-          thumbs.appendChild(img);
-        });
-
-        $('hpRotateNote').textContent = images.length > 1
-          ? '360° VIEW cycles through your available photos. Smooth rotation needs photos captured from multiple angles.'
-          : 'Upload more photos from different angles to enable photo rotation.';
-      }
-
-      function moveImage(step) {
-        if (!images.length) return;
-        index = (index + step + images.length) % images.length;
-        showImage();
-      }
-
-      function extractImages(card) {
-        const result = [];
-
-        card.querySelectorAll('img').forEach(img => {
-          const src = img.currentSrc || img.src;
-          if (src && !img.classList.contains('contact-person-image')) result.push(src);
-        });
-
-        return [...new Set(result)];
-      }
-
-      function openDetails(card) {
-        lastFocus = document.activeElement;
-        stopRotation();
-
-        const titleEl = card.querySelector(
-          'h2, h3, h4, .product-name, .product-title'
-        );
-
-        const title = (titleEl?.textContent || '').trim() || 'Luxury Collection';
-        const text = (card.innerText || '').trim();
-        const priceMatch = text.match(
-          /(?:EGP|LE|جنيه)\s*[\d,.]+|[\d,.]+\s*(?:EGP|LE|جنيه)/i
-        );
-
-        const descriptionEl = card.querySelector(
-          '.product-description, .description'
-        );
-
-        const imageUrls = extractImages(card);
-        images = imageUrls.filter(src => /^https?:/i.test(src));
-        index = 0;
-
-        $('hpDetailsTitle').textContent = title;
-        $('hpDetailsPrice').textContent = priceMatch
-          ? priceMatch[0]
-          : 'Contact us for price';
-
-        $('hpDetailsDescription').textContent =
-          (descriptionEl?.textContent || '').trim() ||
-          'Contact our team for availability, specifications and viewing details.';
-
-        $('hpDetailsSpecs').replaceChildren();
-
-        addSpec('YEAR', card.dataset.year);
-        addSpec('MILEAGE', card.dataset.mileage, ' km');
-        addSpec('HORSEPOWER', card.dataset.horsepower, ' HP');
-        addSpec('ENGINE HOURS', card.dataset.hours, ' hours');
-        addSpec('CATEGORY', card.dataset.category);
-
-        const message = [
-          'Hello Helmy Prestige Luxury, I am interested in:',
-          title,
-          'Price: ' + (priceMatch ? priceMatch[0] : 'Please confirm'),
-          'Please send me more details.'
-        ].join('\n');
-
-        $('hpBuyProduct').href =
-          'https://wa.me/201115000225?text=' + encodeURIComponent(message);
-
-        showImage();
-        overlay.hidden = false;
-        document.body.style.overflow = 'hidden';
-        $('hpDetailsClose').focus();
-      }
-
-      function closeDetails() {
-        overlay.hidden = true;
-        document.body.style.overflow = '';
-        stopRotation();
-        if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
-      }
-
-      list.addEventListener('click', event => {
-        if (event.target.closest('a, button, input, select, textarea')) return;
-
-        let card = event.target.closest('article, .product-card, .public-product-card, .inventory-card');
-
-        if (!card || !list.contains(card)) {
-          card = event.target;
-          while (card && card.parentElement !== list) {
-            card = card.parentElement;
-          }
-        }
-
-        if (!card || card === list) return;
-        if (!card.querySelector('img, h2, h3, h4')) return;
-
-        openDetails(card);
-      });
-
-      $('hpDetailsClose').addEventListener('click', closeDetails);
-
-      overlay.addEventListener('click', event => {
-        if (event.target === overlay) closeDetails();
-      });
-
-      $('hpPhotoPrev').addEventListener('click', () => {
-        stopRotation();
-        moveImage(-1);
-      });
-
-      $('hpPhotoNext').addEventListener('click', () => {
-        stopRotation();
-        moveImage(1);
-      });
-
-      $('hpRotateProduct').addEventListener('click', () => {
-        if (images.length < 2) return;
-
-        if (rotation) {
-          stopRotation();
-          return;
-        }
-
-        $('hpRotateProduct').textContent = 'STOP ROTATION';
-        rotation = setInterval(() => moveImage(1), 850);
-      });
-
-      document.addEventListener('keydown', event => {
-        if (overlay.hidden) return;
-        if (event.key === 'Escape') closeDetails();
-        if (event.key === 'ArrowRight') moveImage(1);
-        if (event.key === 'ArrowLeft') moveImage(-1);
-      });
-
-      const year = document.getElementById('currentYear');
-      if (year) year.textContent = new Date().getFullYear();
-    })();
-  </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js?v=20261010"></script>
 </body>
 </html>
