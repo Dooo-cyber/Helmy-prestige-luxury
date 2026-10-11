@@ -43,10 +43,12 @@
     </p>
 
     
-<button id="enterShowroom"
+<button
+  id="enterShowroom"
   class="button enter-showroom"
   type="button"
-  onclick="document.getElementById('introScreen').hidden = true; document.body.classList.add('showroom-entered');">
+  onclick="var intro=document.getElementById('introScreen'); if(intro){intro.style.setProperty('display','none','important'); intro.hidden=true;} document.body.classList.add('showroom-entered');"
+>
   ENTER SHOWROOM
 </button>
 
