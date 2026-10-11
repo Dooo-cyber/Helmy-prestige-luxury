@@ -1828,3 +1828,17 @@ select:focus-visible {
     background-attachment: scroll !important;
   }
 }
+/* HELMY PRESTIGE — THIRD BACKGROUND IMAGE */
+
+.about-section,
+.contact-section {
+  background-image:
+    linear-gradient(
+      rgba(5, 5, 6, .45),
+      rgba(5, 5, 6, .65)
+    ),
+    url("./background.webp") !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
