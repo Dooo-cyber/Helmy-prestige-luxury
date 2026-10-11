@@ -2622,3 +2622,22 @@ select:focus-visible {
     font-size: 11px;
   }
 }
+/* HELMY PRESTIGE — REMOVE BUY NOW ARROWS */
+
+.public-product-details .btn-primary::before,
+.public-product-details .btn-primary::after,
+.details-info .details-buy::before,
+.details-info .details-buy::after {
+  content: none !important;
+  display: none !important;
+}
+
+.public-product-details .btn-primary,
+.details-info .details-buy {
+  background-image: linear-gradient(
+    120deg,
+    #ffe7a8,
+    #c79642 48%,
+    #f7d889
+  ) !important;
+}
