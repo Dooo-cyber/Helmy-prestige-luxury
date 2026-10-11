@@ -258,15 +258,14 @@ function validImage(src) {
   }
 }
 
-   function validImage(src) {
+   
+function validImage(src) {
   if (typeof src !== "string" || !src.trim()) {
     return "";
   }
 
-  const value = src.trim();
-
   try {
-    const url = new URL(value, window.location.href);
+    const url = new URL(src.trim(), window.location.href);
 
     if (url.protocol === "https:" || url.protocol === "http:") {
       return url.href;
@@ -278,8 +277,12 @@ function validImage(src) {
   }
 }
 
-  return [];
-}
+const whatsappUrl = product =>
+  `https://wa.me/201117000625?text=${encodeURIComponent(
+    `Hello, I want to buy ${product.name || "this product"}. ` +
+    `Price: ${money(product.price)} EGP. Please confirm availability.`
+  )}`;
+
 
 const whatsappUrl = product =>
   `https://wa.me/201117000625?text=${encodeURIComponent(
