@@ -2086,3 +2086,254 @@ select:focus-visible {
     transform: none;
   }
 }
+
+/* =========================================
+   HELMY PRESTIGE — LUXURY LAYOUT UPGRADE
+   ========================================= */
+
+/* ABOUT: PERFORMANCE WITHOUT COMPROMISE */
+.about-section {
+  position: relative !important;
+  isolation: isolate;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 18px !important;
+  min-height: 420px !important;
+  padding: 80px 7% !important;
+  overflow: hidden;
+  text-align: center !important;
+  background-color: #08090b !important;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(5, 5, 7, .32),
+      rgba(5, 5, 7, .55)
+    ),
+    url("./background.webp") !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  border-top: 1px solid rgba(215,174,98,.35);
+  border-bottom: 1px solid rgba(215,174,98,.35);
+}
+
+.about-section > div {
+  position: relative;
+  z-index: 1;
+  max-width: 1000px;
+}
+
+.about-section h2 {
+  margin: 12px 0 18px !important;
+  font-size: clamp(42px, 6vw, 76px) !important;
+  line-height: 1.08 !important;
+  text-shadow: 0 4px 24px rgba(0,0,0,.6);
+}
+
+.about-section > p {
+  position: relative;
+  z-index: 1;
+  max-width: 760px !important;
+  margin: 0 auto !important;
+  color: #f0eee9 !important;
+  font-size: clamp(12px, 1.3vw, 15px) !important;
+  line-height: 1.9 !important;
+  text-shadow: 0 2px 8px #000;
+}
+
+/* FIND YOUR RIDE */
+.contact-section {
+  position: relative !important;
+  isolation: isolate;
+  padding: 55px 6% 80px !important;
+  overflow: hidden;
+  text-align: center !important;
+  background-color: #08090b !important;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(5,5,7,.52),
+      rgba(5,5,7,.72)
+    ),
+    url("./background.webp") !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  border-bottom: 1px solid rgba(215,174,98,.35);
+}
+
+.contact-section > .eyebrow {
+  margin-bottom: 8px;
+  color: #f1cf83 !important;
+  letter-spacing: 4px !important;
+}
+
+.contact-section h2 {
+  margin: 8px 0 30px !important;
+  font-size: clamp(42px, 6vw, 68px) !important;
+  line-height: 1.1 !important;
+  text-shadow: 0 4px 22px #000;
+}
+
+/* OWNER AND MANAGER CARDS */
+.contact-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 26px !important;
+  width: 100% !important;
+  max-width: 1000px !important;
+  margin: 35px auto 0 !important;
+  text-align: left !important;
+}
+
+.contact-card {
+  position: relative;
+  min-width: 0;
+  padding: 16px !important;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    rgba(23,23,25,.94),
+    rgba(7,8,10,.96)
+  ) !important;
+  border: 1px solid rgba(225,185,102,.62) !important;
+  border-radius: 4px;
+  box-shadow: 0 16px 42px rgba(0,0,0,.38);
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+  border-color: #f4d28c !important;
+  box-shadow: 0 20px 48px rgba(190,143,57,.15);
+}
+
+.contact-person-image {
+  width: 100% !important;
+  height: 280px !important;
+  margin: 0 0 20px !important;
+  object-fit: cover !important;
+  object-position: center 30% !important;
+  background: #101115 !important;
+  border: 1px solid rgba(215,174,98,.35);
+  border-radius: 2px;
+}
+
+.contact-card .eyebrow {
+  margin: 0 0 5px;
+  color: #e5bd6e !important;
+  font-size: 9px !important;
+  letter-spacing: 3px !important;
+}
+
+.contact-card h3 {
+  margin: 5px 0 12px !important;
+  color: #fff7e7 !important;
+  font-size: clamp(25px, 3vw, 34px) !important;
+  line-height: 1.2;
+}
+
+.contact-card p:not(.eyebrow) {
+  color: #bfc0c4 !important;
+  line-height: 1.8;
+}
+
+.contact-card a {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 12px !important;
+  color: #f3d28c !important;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  transition: color .2s ease;
+}
+
+.contact-card a:hover {
+  color: #fff !important;
+}
+
+/* TABLETS */
+@media (max-width: 800px) {
+  .about-section {
+    min-height: 360px !important;
+    padding: 65px 6% !important;
+  }
+
+  .contact-section {
+    padding: 45px 5% 60px !important;
+  }
+
+  .contact-grid {
+    gap: 16px !important;
+  }
+
+  .contact-person-image {
+    height: 230px !important;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .about-section {
+    min-height: 340px !important;
+    padding: 55px 6% !important;
+    background-position: center center !important;
+  }
+
+  .about-section h2 {
+    font-size: clamp(35px, 10vw, 48px) !important;
+  }
+
+  .about-section > p {
+    font-size: 12px !important;
+    line-height: 1.85 !important;
+  }
+
+  .contact-section {
+    padding: 42px 5% 50px !important;
+  }
+
+  .contact-section h2 {
+    font-size: clamp(38px, 10vw, 50px) !important;
+    margin-bottom: 24px !important;
+  }
+
+  .contact-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 22px !important;
+    max-width: 420px !important;
+    margin-top: 25px !important;
+  }
+
+  .contact-card {
+    padding: 13px !important;
+  }
+
+  .contact-person-image {
+    height: 260px !important;
+    object-position: center 25% !important;
+  }
+
+  .contact-card h3 {
+    font-size: 29px !important;
+  }
+}
+
+/* REDUCE IMAGE FLASHING */
+.intro-screen,
+.showroom-hero,
+.about-section,
+.contact-section {
+  background-attachment: scroll !important;
+}
+
+.contact-person-image {
+  content-visibility: auto;
+}
