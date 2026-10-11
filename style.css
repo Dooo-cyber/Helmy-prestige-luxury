@@ -1795,7 +1795,7 @@ select:focus-visible {
       rgba(3, 3, 4, .20),
       rgba(3, 3, 4, .48)
     ),
-    url("assets/helmy-showroom.png") !important;
+    url("./showroom.webp") !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
