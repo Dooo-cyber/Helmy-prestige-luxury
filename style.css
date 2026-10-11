@@ -2337,3 +2337,288 @@ select:focus-visible {
 .contact-person-image {
   content-visibility: auto;
 }
+
+/* ==========================================
+   HELMY PRESTIGE — LUXURY SECTION REDESIGN
+   Append at the END of style.css
+========================================== */
+
+/* ABOUT — PERFORMANCE WITHOUT COMPROMISE */
+
+.about-section {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  min-height: 440px;
+  padding: 85px 7%;
+  overflow: hidden;
+  background-color: #08090b !important;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(5, 5, 6, .42),
+      rgba(5, 5, 6, .72)
+    ),
+    url("./background.webp") !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  border-top: 1px solid rgba(215,174,98,.4);
+  border-bottom: 1px solid rgba(215,174,98,.4);
+  text-align: center;
+}
+
+.about-section > div,
+.about-section > p {
+  position: relative;
+  z-index: 1;
+}
+
+.about-section .eyebrow {
+  margin-bottom: 15px;
+  color: #e3bd72;
+  font-size: 10px;
+  letter-spacing: 4px;
+}
+
+.about-section h2 {
+  margin: 0;
+  color: #f8f3e9;
+  font-family: var(--display);
+  font-size: clamp(38px, 6vw, 72px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -.7px;
+}
+
+.about-section h2 em {
+  color: #e8c77e;
+  font-weight: 400;
+}
+
+.about-section > p {
+  max-width: 720px;
+  margin: 0 auto;
+  color: rgba(245,241,232,.88);
+  font-size: 13px;
+  line-height: 2;
+}
+
+/* CONTACT — FIND YOUR RIDE */
+
+.contact-section {
+  position: relative;
+  isolation: isolate;
+  padding: 75px 6% 90px;
+  overflow: hidden;
+  background-color: #08090b !important;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(5,5,6,.42),
+      rgba(5,5,6,.78)
+    ),
+    url("./background.webp") !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  text-align: center;
+}
+
+.contact-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.contact-section > .eyebrow {
+  color: #e4bf78;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.contact-section h2 {
+  margin: 10px 0 12px;
+  color: #f8f3e9;
+  font-family: var(--display);
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.contact-section h2 em {
+  color: #e8c77e;
+  font-weight: 400;
+}
+
+/* OWNER + MANAGER CARDS */
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 25px;
+  width: 100%;
+  max-width: 960px;
+  margin: 38px auto 0;
+  text-align: left;
+}
+
+.contact-card {
+  position: relative;
+  min-width: 0;
+  padding: 18px;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    rgba(20,19,17,.94),
+    rgba(7,8,10,.96)
+  );
+  border: 1px solid rgba(222,183,105,.7);
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.34),
+    inset 0 0 0 1px rgba(255,224,160,.06);
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.contact-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #f5d58f,
+    transparent
+  );
+}
+
+.contact-card:hover {
+  transform: translateY(-5px);
+  border-color: #ffe2a0;
+  box-shadow: 0 20px 45px rgba(0,0,0,.45);
+}
+
+.contact-person-image {
+  display: block;
+  width: 100%;
+  height: clamp(220px, 27vw, 330px);
+  margin: 0 0 20px;
+  object-fit: cover;
+  object-position: center 35%;
+  background: #111318;
+  border: 1px solid rgba(220,185,115,.45);
+}
+
+.contact-card .eyebrow {
+  margin: 0 0 7px;
+  color: #e5bf71;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.contact-card h3 {
+  margin: 0 0 10px;
+  color: #fff8eb;
+  font-family: var(--display);
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.contact-card p:not(.eyebrow) {
+  margin: 0 0 15px;
+  color: #b9b6b0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.contact-card a {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 12px;
+  color: #f0d18b;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  transition: color .2s ease;
+}
+
+.contact-card a:hover {
+  color: #fff1c9;
+  text-decoration: none;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .about-section {
+    min-height: 360px;
+    gap: 18px;
+    padding: 60px 6%;
+    background-attachment: scroll !important;
+  }
+
+  .about-section h2 {
+    font-size: clamp(36px, 9vw, 52px);
+  }
+
+  .about-section > p {
+    font-size: 12px;
+    line-height: 1.9;
+  }
+
+  .contact-section {
+    padding: 58px 5% 65px;
+    background-attachment: scroll !important;
+  }
+
+  .contact-section h2 {
+    font-size: clamp(40px, 10vw, 56px);
+  }
+
+  .contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    max-width: 430px;
+    margin-top: 28px;
+  }
+
+  .contact-card {
+    padding: 15px;
+  }
+
+  .contact-person-image {
+    height: 260px;
+    object-position: center 30%;
+  }
+
+  .contact-card h3 {
+    font-size: 31px;
+  }
+}
+
+@media (max-width: 380px) {
+  .contact-person-image {
+    height: 220px;
+  }
+
+  .contact-card {
+    padding: 12px;
+  }
+
+  .contact-card a {
+    font-size: 11px;
+  }
+}
