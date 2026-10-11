@@ -1700,159 +1700,131 @@ select:focus-visible {
   pointer-events: none !important;
 }
 
-/* FINAL HELMY PRESTIGE INTRO FIX */
+
+/* FINAL HELMY PRESTIGE — RESTORED INTRO AND IMAGE BACKGROUNDS */
 
 .intro-screen {
   background-color: #08090b !important;
   background-image:
     linear-gradient(
       180deg,
-      rgba(0,0,0,.30),
-      rgba(0,0,0,.72)
+      rgba(0, 0, 0, .30),
+      rgba(0, 0, 0, .72)
     ),
     url("./888D801F-E422-4843-8A5C-39E0F8BE4402.png") !important;
-  background-position: center !important;
+  background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
 }
 
+.intro-overlay {
+  pointer-events: none !important;
+}
+
 .intro-content {
-  position: relative !important;
+  position: absolute !important;
+  inset: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   width: 100% !important;
   height: 100% !important;
+  padding: 20px !important;
   text-align: center !important;
   pointer-events: auto !important;
-}
-
-.intro-brand {
-  margin: 0 0 18px !important;
+  z-index: 2 !important;
 }
 
 .intro-monogram {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
   width: 70px !important;
   height: 70px !important;
-  margin: 0 auto 12px !important;
-  border: 1px solid #e5c579 !important;
-  color: #f4d99b !important;
-  font-family: Georgia, serif !important;
-  font-size: 32px !important;
+  margin: 0 auto 18px !important;
 }
 
-.intro-brand-name {
-  margin: 0 !important;
-  color: #fff3d6 !important;
-  font-family: Georgia, serif !important;
-  font-size: clamp(22px, 4vw, 36px) !important;
-  letter-spacing: 3px !important;
-}
-
-.intro-brand-luxury {
-  margin: 5px 0 !important;
-  color: #e5c579 !important;
-  font-size: 10px !important;
-  letter-spacing: 5px !important;
-}
-
-.intro-brand-line {
-  width: 65px !important;
-  height: 1px !important;
-  margin: 14px auto !important;
-  background: #e5c579 !important;
-}
-
-.intro-eyebrow {
-  color: #e5c579 !important;
-  font-size: 10px !important;
-  letter-spacing: 3px !important;
-}
-
-.intro-title {
-  margin: 8px 0 !important;
-  color: #fff !important;
-  font-family: Georgia, serif !important;
-  font-size: clamp(36px, 7vw, 70px) !important;
-  font-weight: 400 !important;
-  line-height: 1.08 !important;
-}
-
-.intro-title span {
-  color: #e5c579 !important;
-  font-style: italic !important;
-}
-
-.intro-description {
-  color: #fff0cf !important;
-  font-size: 11px !important;
-  letter-spacing: 2px !important;
-}
-
-.intro-categories {
-  color: #eee !important;
-  font-size: 9px !important;
-  letter-spacing: 1px !important;
-}
-
-.intro-footer {
-  color: #e5c579 !important;
-  font-size: 8px !important;
-  letter-spacing: 2px !important;
+.intro-monogram img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  pointer-events: none !important;
 }
 
 #enterShowroom {
   position: relative !important;
   top: auto !important;
   left: auto !important;
+  z-index: 5 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 0 !important;
-  margin: 25px auto 0 !important;
+  min-width: 205px !important;
+  min-height: 50px !important;
+  margin: 24px auto 0 !important;
+  padding: 15px 25px !important;
   transform: none !important;
-  background: linear-gradient(120deg, #f7df9f, #c99c4e, #f0d38c) !important;
-  color: #151006 !important;
-  border: 1px solid #e5c579 !important;
+  background: linear-gradient(
+    120deg,
+    #ffe7a8,
+    #c79642,
+    #f7d889
+  ) !important;
+  color: #100c05 !important;
+  border: 1px solid #e3bb6b !important;
   pointer-events: auto !important;
+  touch-action: manipulation !important;
+  cursor: pointer !important;
 }
 
-#enterShowroom span[aria-hidden="true"] {
-  display: none !important;
+#enterShowroom:hover {
+  transform: translateY(-2px) !important;
 }
 
-#enterShowroom::before,
-#enterShowroom::after {
-  content: none !important;
-  display: none !important;
+.intro-screen.intro-exit,
+.intro-screen.is-leaving {
+  pointer-events: none !important;
+}
+
+.showroom-hero {
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(3, 3, 4, .48),
+      rgba(3, 3, 4, .20),
+      rgba(3, 3, 4, .48)
+    ),
+    url("assets/helmy-showroom.png") !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
 }
 
 @media (max-width: 480px) {
   .intro-content {
-    padding: 20px 10px !important;
+    padding: 18px 12px !important;
   }
 
   .intro-monogram {
-    width: 54px !important;
-    height: 54px !important;
-    font-size: 26px !important;
+    width: 58px !important;
+    height: 58px !important;
+    margin-bottom: 12px !important;
   }
 
-  .intro-brand-name {
-    font-size: 22px !important;
-    letter-spacing: 2px !important;
+  .intro-content h1 {
+    font-size: clamp(32px, 9vw, 46px) !important;
   }
 
-  .intro-title {
-    font-size: clamp(34px, 9vw, 46px) !important;
+  #enterShowroom {
+    min-width: 180px !important;
+    padding: 13px 18px !important;
   }
+}
 
-  .intro-categories {
-    max-width: 300px !important;
-    line-height: 1.8 !important;
+@media (max-width: 700px) {
+  .intro-screen,
+  .showroom-hero {
+    background-attachment: scroll !important;
   }
 }
