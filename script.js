@@ -258,22 +258,25 @@ function validImage(src) {
   }
 }
 
-function productImages(product) {
-  if (Array.isArray(product?.images)) {
-    return product.images;
+   function validImage(src) {
+  if (typeof src !== "string" || !src.trim()) {
+    return "";
   }
 
-  if (typeof product?.images === "string") {
-    try {
-      const parsed = JSON.parse(product.images);
+  const value = src.trim();
 
-      return Array.isArray(parsed)
-        ? parsed
-        : product.images.split(/\n+/).filter(Boolean);
-    } catch {
-      return product.images.split(/\n+/).filter(Boolean);
+  try {
+    const url = new URL(value, window.location.href);
+
+    if (url.protocol === "https:" || url.protocol === "http:") {
+      return url.href;
     }
+
+    return "";
+  } catch {
+    return "";
   }
+}
 
   return [];
 }
