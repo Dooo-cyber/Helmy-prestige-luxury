@@ -8,7 +8,7 @@
   const SUPABASE_URL =
     "https://fnftfpthzlgkfexnknaw.supabase.co";
   const SUPABASE_KEY =
-    "sb_publishable_wugH6rf-d6HXXQU2tkvWtg_YxdWz8OP";
+    "sb_publishable_wugH6rf-d6hXXQU2tkvWtg_YxdWz8OP";
   // 2. ELEMENTS AND STATE
   const $ = (selector, root = document) =>
     root.querySelector(selector);
